@@ -1,16 +1,16 @@
 import React, { Component } from 'react'
-
+import Paper from '@material-ui/core/Paper';
 import ShoppingCart from '@material-ui/icons/ShoppingCart';
 
-class Cart extends Component {
+class CartInfo extends Component {
     render() {
 
         return (
-            <div id="cart">
+            <Paper id="cart">
                 <ShoppingCart style={{width: 42, height: 42}} />
-            </div>
+            </Paper>
         )
     }
 }
 
-export default Cart;
+export default CartInfo;

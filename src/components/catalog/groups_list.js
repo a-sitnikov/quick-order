@@ -1,33 +1,52 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 
-import Paper from '@material-ui/core/Paper';
+import TextField from '@material-ui/core/TextField';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
 
+import { fetchGroups } from '../../modules/groups_list'
 
 class GropusList extends Component {
-    
-    render() {
 
-        let items = [];
-        items.push(                <ListItem key={0}>
-            Item 0
-        </ListItem>);
-       items.push(                <ListItem key={1}>Ntcn
-    </ListItem>)        
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch(fetchGroups());
+  }
 
-        return (
-            <div id="groups">
-            Группы
-                <List>
-                    <ListSubheader>Все категории</ListSubheader>
-                    {items}
-                </List>    
-            </div>
-        )
-    }
+  render() {
+
+    const { items } = this.props;
+
+    return (
+      <div id="groups" style={{ padding: "10px" }}>
+        <TextField fullWidth={true} placeholder="фильтр категорий" />
+        <List>
+          <ListSubheader>Все категории</ListSubheader>
+          {items.map(item => (
+            <ListItem key={item.guid}>
+              {item.descr}
+            </ListItem>
+          ))}
+        </List>
+      </div>
+    )
+  }
 }
 
-export default GropusList;
+
+const mapStateToProps = (state) => {
+
+  const { 
+    items,
+    selected 
+  } = state.groups;
+
+  return {
+    items, 
+    selected 
+  }
+}
+
+export default connect(mapStateToProps)(GropusList);

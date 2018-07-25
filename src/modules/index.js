@@ -1,11 +1,13 @@
 import { combineReducers } from 'redux'
 
-import catalog from './catalog'
+import list from './items_list'
+import groups from './groups_list'
 import cart from './cart'
 
 const rootReducer = combineReducers({
-    catalog,
-    cart
+  list,
+  groups,
+  cart
 });
 
 export default rootReducer;

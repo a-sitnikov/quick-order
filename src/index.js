@@ -2,46 +2,32 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import registerServiceWorker from './registerServiceWorker';
 import { Provider } from 'react-redux'
-import { createStore, applyMiddleware } from 'redux'
 import { BrowserRouter, HashRouter, Switch, Route } from 'react-router-dom'
 
-import thunk from 'redux-thunk'
+import { store } from './store'
 
-// eslint-disable-next-line 
-import { createLogger } from 'redux-logger'
-
-import reducer from './reducers'
 import './index.css';
 
-import Header from './components/header';
+import NavBar from './components/navbar';
 import Catalog from './components/catalog';
-
-const middleware = [thunk];
-
-if (process.env.NODE_ENV !== 'production') {
-    //middleware.push(createLogger())
-}
-
-const store = createStore(
-    reducer,
-    applyMiddleware(...middleware)
-)
+import Cart from './components/cart';
 
 const Root = ({ store }) => (
-    <Provider store={store}>
-        <BrowserRouter>
-            <div className="container">
-                <Header />
-                <Switch>
-                    <Route exact path='/' component={Catalog} />
-                </Switch>
-            </div>
-        </BrowserRouter>
-    </Provider>
+  <Provider store={store}>
+    <BrowserRouter>
+      <div className="container">
+        <NavBar />
+        <Switch>
+          <Route exact path='/' component={Catalog} />
+          <Route path='/cart' component={Cart} />
+        </Switch>
+      </div>
+    </BrowserRouter>
+  </Provider>
 )
 
 ReactDOM.render(<Root store={store} />,
-    document.getElementById('root'));
+  document.getElementById('root'));
 
 registerServiceWorker();
 
