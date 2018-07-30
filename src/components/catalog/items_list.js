@@ -1,16 +1,35 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import TableFooter from '@material-ui/core/TableFooter';
-import TablePagination from '@material-ui/core/TablePagination';
-import TableSortLabel from '@material-ui/core/TableSortLabel';
+import { Table, TableBody, TableHead, TableRow, TableCell, TableFooter } from '@material-ui/core';
+import { TablePagination, TableSortLabel } from '@material-ui/core';
 
-import { fetchItems, sortItemsList } from '../../modules/items_list'
+import { fetchItems, sortItemsList, addSortItemsList } from '../../modules/items_list'
+
+const HeaderCell = ({ id, order, sortable, children, onClick }) => {
+
+  const orderBy = order.find(val => val.field === id);
+  const isActive = (orderBy !== undefined);
+  const direction = isActive ? orderBy.direction : "asc";
+
+  if (!sortable) 
+    return (
+      <TableCell >
+        {children}
+      </TableCell>
+    )
+  else  
+    return (
+      <TableCell >
+        <TableSortLabel
+          active={isActive}
+          direction={direction}
+          onClick={onClick}
+        >{children}
+        </TableSortLabel>
+      </TableCell>
+    )
+}
 
 class ItemsList extends Component {
 
@@ -31,27 +50,27 @@ class ItemsList extends Component {
 
   }
 
-  createSortHandler = colId => event => {
-    let { orderBy, order, dispatch } = this.props;
-    if (colId === orderBy) {
-      order = (order === "asc" ? "desc" : "asc");
-    } else {
-      orderBy = colId;
-      order = "asc";
-    }
+  createSortHandler = orderBy => event => {
 
-    dispatch(sortItemsList(orderBy, order));
+    const { dispatch } = this.props;
+    console.log(event)
+
+    if (event.ctrlKey) {
+      dispatch(addSortItemsList(orderBy));
+    } else {
+      dispatch(sortItemsList(orderBy));
+    }
   }
 
   render() {
 
-    const { currentPage, rowsPerPage, orderBy, order, items, rowCount } = this.props;
+    const { currentPage, rowsPerPage, order, items, rowCount } = this.props;
 
     let columns = [
-      { id: 'code', numeric: false, label: 'Код' },
-      { id: 'descr', numeric: false, label: 'Наименование' },
-      { id: 'price', numeric: true, label: 'Цена' },
-      { id: 'qty', numeric: true, label: 'Количество' }
+      { id: 'code', numeric: false, label: 'Код', sortable: true },
+      { id: 'descr', numeric: false, label: 'Наименование', sortable: true  },
+      { id: 'price', numeric: true, label: 'Цена', sortable: true  },
+      { id: 'qty', numeric: true, label: 'Количество', sortable: false  }
     ]
 
     return (
@@ -59,14 +78,15 @@ class ItemsList extends Component {
         <TableHead>
           <TableRow>
             {columns.map(col => (
-              <TableCell key={col.id} >
-                <TableSortLabel
-                  active={col.id === orderBy}
-                  direction={order}
-                  onClick={this.createSortHandler(col.id)}
-                >{col.label}
-                </TableSortLabel>
-              </TableCell>
+              <HeaderCell 
+                key={col.id} 
+                id={col.id} 
+                order={order}
+                sortable={col.sortable}
+                onClick={this.createSortHandler(col.id)}
+                >
+              {col.label}
+              </HeaderCell>
             ))}
           </TableRow>
         </TableHead>
@@ -98,22 +118,20 @@ class ItemsList extends Component {
 
 const mapStateToProps = (state) => {
 
-  const { 
-    currentPage, 
-    rowsPerPage, 
-    rowCount, 
-    orderBy,
+  const {
+    currentPage,
+    rowsPerPage,
+    rowCount,
     order,
-    items 
+    items
   } = state.list;
 
   return {
-    currentPage, 
-    rowsPerPage, 
-    rowCount, 
-    orderBy,
+    currentPage,
+    rowsPerPage,
+    rowCount,
     order,
-    items 
+    items
   }
 }
 

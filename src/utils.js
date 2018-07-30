@@ -15,11 +15,24 @@ export const objectToArray = (obj, keyName = 'guid') => {
   })
 }
 
-export const sortArray = (array, orderBy, order) => {
+export const sortArray = (array, order) => {
   return array.map(x => x).sort((a, b) => {
-    if (order === 'asc')
-      return a[orderBy] > b[orderBy] ? 1 : -1
-    else  
-      return a[orderBy] < b[orderBy] ? 1 : -1
+    
+    for (let val of order) {
+      if (a[val.field] > b[val.field]) {
+        
+        if (val.direction === "asc")
+          return 1;
+        else  
+          return -1;
+
+      } else if (a[val.field] < b[val.field]) {
+        
+        if (val.direction === "asc")
+          return -1;
+        else  
+          return 1;
+      }
+    }
   })
 }

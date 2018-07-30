@@ -2,8 +2,7 @@ import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
+import { AppBar, Tabs, Tab } from '@material-ui/core';
 
 class NavBar extends Component {
 
@@ -21,17 +20,19 @@ class NavBar extends Component {
     ]
 
     return (
-      <Tabs value={location.pathname}>
-        {menuItems.map(val => (
-          <Tab
-            key={val.path}
-            label={val.label}
-            component={Link}
-            to={val.path}
-            value={val.path}
-          />
-        ))}
-      </Tabs>
+      <AppBar position="static" color="default">
+        <Tabs value={location.pathname}>
+          {menuItems.map(val => (
+            <Tab
+              key={val.path}
+              label={val.label}
+              component={Link}
+              to={val.path}
+              value={val.path}
+            />
+          ))}
+        </Tabs>
+      </AppBar>
     )
   }
 
