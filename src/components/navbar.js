@@ -1,14 +1,19 @@
 import React, { Component } from 'react'
+import { compose } from 'redux'
 import { withRouter } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 
-import { AppBar, Tabs, Tab } from '@material-ui/core';
+import { AppBar, Button, withStyles } from '@material-ui/core';
 
 class NavBar extends Component {
 
+  componentWillReceiveProps(props) {
+    console.log(props);
+  }
+
   render() {
 
-    const { location } = this.props;
+    const { classes, location } = this.props;
 
     let menuItems = [
       { path: '/', label: 'Каталог' },
@@ -17,25 +22,40 @@ class NavBar extends Component {
       { path: '/quick', label: 'Быстрый заказ' },
       { path: '/profile', label: 'Профиль' },
       { path: '/help', label: 'Помощь' },
-    ]
+    ];
+    console.log(1, location)
 
     return (
-      <AppBar position="static" color="default">
-        <Tabs value={location.pathname}>
+      <AppBar position="static" color="default" className={classes.appbar}>
+        <div>
           {menuItems.map(val => (
-            <Tab
+            <Button
               key={val.path}
-              label={val.label}
               component={Link}
               to={val.path}
-              value={val.path}
-            />
+              variant={val.path === location.pathname ? "raised" : "flat"}
+            >
+              {val.label}
+            </Button>
           ))}
-        </Tabs>
+        </div>
       </AppBar>
     )
   }
 
 }
 
-export default withRouter(NavBar);
+const styles = theme => ({
+  active: {
+
+  },
+  appbar: {
+    padding: theme.spacing.unit
+  }
+})
+
+export default compose(
+  withRouter,
+  withStyles(styles)
+)(NavBar);
+

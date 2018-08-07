@@ -34,5 +34,7 @@ export const sortArray = (array, order) => {
           return 1;
       }
     }
+
+    return 0;
   })
 }

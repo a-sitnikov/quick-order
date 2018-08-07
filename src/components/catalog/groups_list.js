@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
+import { compose } from 'redux'
 import { connect } from 'react-redux'
 
 import TextField from '@material-ui/core/TextField';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListSubheader from '@material-ui/core/ListSubheader';
+import { withStyles } from '@material-ui/core';
 
 import { fetchGroups } from '../../modules/groups_list'
 
@@ -17,11 +19,11 @@ class GropusList extends Component {
 
   render() {
 
-    const { items } = this.props;
+    const { items, classes } = this.props;
 
     return (
-      <div id="groups" style={{ padding: "10px" }}>
-        <TextField fullWidth={true} placeholder="фильтр категорий" />
+      <div id="groups" className={classes.groups}>
+        <TextField fullWidth={true} label="Фильтр категорий" />
         <List>
           <ListSubheader>Все категории</ListSubheader>
           {items.map(item => (
@@ -49,4 +51,15 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps)(GropusList);
+const styles = theme => ({
+  groups: {
+    gridArea: "groups",
+    padding: theme.spacing.unit
+  },
+});
+
+
+export default compose(
+  withStyles(styles),
+  connect(mapStateToProps)
+)(GropusList);

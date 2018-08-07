@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Switch, Route, withRouter } from 'react-router-dom'
+import { compose } from 'redux'
 import { connect } from 'react-redux'
 
 import NavBar from './components/navbar';
@@ -10,11 +11,6 @@ import FirebaseConfig from './firebase_config';
 import { fbCheckConnected } from './modules/fbconfig';
 
 class App extends Component {
-  
-  constructor(props) {
-    super(props);
-
-  }
 
   componentDidMount() {
     const { dispatch } = this.props;
@@ -28,7 +24,7 @@ class App extends Component {
     if (fbConfig.apiKey) {
       if (login.uid)
         return (
-          <div className="container">
+          <div>
             <NavBar />
             <Switch>
               <Route exact path='/' component={Catalog} />
@@ -54,4 +50,7 @@ const mapStateToProps = (state) => {
 
 }
 
-export default connect(mapStateToProps)(App);
+export default compose(
+  withRouter,
+  connect(mapStateToProps)
+)(App);

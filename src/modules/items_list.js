@@ -1,6 +1,7 @@
 import * as utils from '../utils'
 
 export const defaultState = {
+  currentRow: 0,
   currentPage: 0,
   rowsPerPage: 25,
   order: [
@@ -13,6 +14,7 @@ export const defaultState = {
 export const RECIEVE  = 'RECIEVE_ITEMS';
 export const SORT     = 'SORT_ITEMS';
 export const ADD_SORT = 'ADD_SORT_ITEMS';
+export const CHANGE_CURRENT_ROW = 'CHANGE_CURRENT_ROW';
 
 export default function reducer(state = defaultState, action){
 
@@ -23,6 +25,7 @@ export default function reducer(state = defaultState, action){
         ...state,
         items: utils.objectToArray(action.payload)
       };
+
     case ADD_SORT: {
       const index = state.order.findIndex(val => val.field === action.payload);
       let order = state.order.slice();        
@@ -57,7 +60,13 @@ export default function reducer(state = defaultState, action){
         order,
         items: utils.sortArray(state.items, order)
       };
-    }  
+    } 
+    
+    case CHANGE_CURRENT_ROW: 
+    return {
+      ...state,
+      currentRow: action.payload
+    }
     default:
       return state;
   }
@@ -79,6 +88,11 @@ export const sortItemsList = (orderBy) => ({
 export const addSortItemsList = (orderBy) => ({
   type: ADD_SORT,
   payload: orderBy
+})
+
+export const changeCurrentRow = (currentRow) => ({
+  type: CHANGE_CURRENT_ROW,
+  payload: currentRow
 })
 
 export const fetchItems = () => async (dispatch, getState, getFirebase) => {

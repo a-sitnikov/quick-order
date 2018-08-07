@@ -1,26 +1,28 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { compose } from 'redux'
 
-import { Table, TableBody, TableHead, TableRow, TableCell, TableFooter } from '@material-ui/core';
-import { TablePagination, TableSortLabel } from '@material-ui/core';
+import { Table, TableBody, TableHead, TableRow, TableCell, withStyles } from '@material-ui/core';
+import { TableSortLabel } from '@material-ui/core';
 
+import Search from './search'
 import { fetchItems, sortItemsList, addSortItemsList } from '../../modules/items_list'
 
-const HeaderCell = ({ id, order, sortable, children, onClick }) => {
+const HeaderCell = ({ id, order, sortable, className, children, onClick }) => {
 
   const orderBy = order.find(val => val.field === id);
   const isActive = (orderBy !== undefined);
   const direction = isActive ? orderBy.direction : "asc";
 
-  if (!sortable) 
+  if (!sortable)
     return (
       <TableCell >
         {children}
       </TableCell>
     )
-  else  
+  else
     return (
-      <TableCell >
+      <TableCell className={className}>
         <TableSortLabel
           active={isActive}
           direction={direction}
@@ -33,9 +35,36 @@ const HeaderCell = ({ id, order, sortable, children, onClick }) => {
 
 class ItemsList extends Component {
 
+  constructor() {
+    super();
+    this.state = {
+      currentRow: 0
+    }
+    this.inputs = [];
+  }
+
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch(fetchItems());
+
+  }
+
+  componentDidUpdate() {
+    if (this.currentInput)
+      this.currentInput.focus();
+  }
+
+  handleKeyDown = (event) => {
+
+    if (event.key === 'ArrowDown')
+      this.setState({
+        currentRow: this.state.currentRow + 1
+      })
+
+    else if (event.key === 'ArrowUp')
+      this.setState({
+        currentRow: Math.max(0, this.state.currentRow - 1)
+      })
   }
 
   handlePageChange = (event) => {
@@ -50,10 +79,20 @@ class ItemsList extends Component {
 
   }
 
+  handleRowClik = currentRow => event => {
+    this.setState({
+      currentRow
+    })
+  }
+
+  setInputRef = i => element => {
+    if (this.state.currentRow === i)
+      this.currentInput = element;
+  }
+
   createSortHandler = orderBy => event => {
 
     const { dispatch } = this.props;
-    console.log(event)
 
     if (event.ctrlKey) {
       dispatch(addSortItemsList(orderBy));
@@ -64,54 +103,53 @@ class ItemsList extends Component {
 
   render() {
 
-    const { currentPage, rowsPerPage, order, items, rowCount } = this.props;
+    const { list: {order, items}, classes } = this.props;
 
     let columns = [
       { id: 'code', numeric: false, label: 'Код', sortable: true },
-      { id: 'descr', numeric: false, label: 'Наименование', sortable: true  },
-      { id: 'price', numeric: true, label: 'Цена', sortable: true  },
-      { id: 'qty', numeric: true, label: 'Количество', sortable: false  }
+      { id: 'descr', numeric: false, label: 'Наименование', sortable: true },
+      { id: 'price', numeric: true, label: 'Цена', sortable: true },
+      { id: 'qty', numeric: true, label: 'Количество', sortable: false }
     ]
 
     return (
-      <Table id="table">
-        <TableHead>
-          <TableRow>
-            {columns.map(col => (
-              <HeaderCell 
-                key={col.id} 
-                id={col.id} 
-                order={order}
-                sortable={col.sortable}
-                onClick={this.createSortHandler(col.id)}
+      <div className={classes.gridArea}>
+        <Search />
+        <Table id="table" onKeyDown={this.handleKeyDown}>
+          <TableHead>
+            <TableRow className={classes.header}>
+              {columns.map(col => (
+                <HeaderCell
+                  key={col.id}
+                  id={col.id}
+                  order={order}
+                  sortable={col.sortable}
+                  onClick={this.createSortHandler(col.id)}
                 >
-              {col.label}
-              </HeaderCell>
-            ))}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {items.map((val, i) => (
-            <TableRow key={i}>
-              <TableCell>{val.code}</TableCell>
-              <TableCell>{val.descr}</TableCell>
-              <TableCell numeric>{val.price}</TableCell>
-              <TableCell><input value={val.qty} onChange={this.handleQtyChange} /></TableCell>
+                  {col.label}
+                </HeaderCell>
+              ))}
             </TableRow>
-          ))}
-        </TableBody>
-        <TableFooter>
-          <TableRow>
-            <TablePagination
-              count={rowCount}
-              page={currentPage}
-              rowsPerPage={rowsPerPage}
-              onChangePage={this.handlePageChange}
-              onChangeRowsPerPage={this.handleChangeRowsPerPage}
-            />
-          </TableRow>
-        </TableFooter>
-      </Table>
+          </TableHead>
+          <TableBody>
+            {items.map((val, i) => {
+              let className;
+              if (i === this.state.currentRow) {
+                className = classes.active;
+              }
+              return (
+                <TableRow key={i} className={className} onClick={this.handleRowClik(i)}>
+                  <TableCell>{val.code}</TableCell>
+                  <TableCell>{val.descr}</TableCell>
+                  <TableCell numeric>{val.price}</TableCell>
+                  <TableCell><input value={val.qty} onChange={this.handleQtyChange} ref={this.setInputRef(i)} /></TableCell>
+                </TableRow>
+              )
+            }
+            )}
+          </TableBody>
+        </Table >
+      </div>
     )
   }
 }
@@ -119,20 +157,31 @@ class ItemsList extends Component {
 const mapStateToProps = (state) => {
 
   const {
-    currentPage,
-    rowsPerPage,
-    rowCount,
-    order,
-    items
-  } = state.list;
+    list,
+    cart
+  } = state;
 
   return {
-    currentPage,
-    rowsPerPage,
-    rowCount,
-    order,
-    items
+    list,
+    cart
   }
 }
 
-export default connect(mapStateToProps)(ItemsList);
+const styles = {
+  active: {
+    backgroundColor: "#f3ef97"
+  },
+  gridArea: {
+    gridArea: "table"
+  },
+  header: {
+    backgroundColor: "#e0e0e0",
+    height: "48px",
+    fontWeight: "bold"
+  }
+}
+
+export default compose(
+  connect(mapStateToProps),
+  withStyles(styles)
+)(ItemsList);
