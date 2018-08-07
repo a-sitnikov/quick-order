@@ -5,6 +5,8 @@ import { compose } from 'redux'
 import { Table, TableBody, TableHead, TableRow, TableCell, withStyles } from '@material-ui/core';
 import { TableSortLabel } from '@material-ui/core';
 
+import { Column, Table as TableV } from 'react-virtualized';
+
 import Search from './search'
 import { fetchItems, sortItemsList, addSortItemsList } from '../../modules/items_list'
 
@@ -56,7 +58,7 @@ class ItemsList extends Component {
 
   handleKeyDown = (event) => {
 
-    if (event.key === 'ArrowDown')
+    if (event.key === 'ArrowDown' || event.key === 'Enter')
       this.setState({
         currentRow: this.state.currentRow + 1
       })
@@ -65,14 +67,6 @@ class ItemsList extends Component {
       this.setState({
         currentRow: Math.max(0, this.state.currentRow - 1)
       })
-  }
-
-  handlePageChange = (event) => {
-
-  }
-
-  handleChangeRowsPerPage = (event) => {
-
   }
 
   handleQtyChange = (event) => {
@@ -103,7 +97,7 @@ class ItemsList extends Component {
 
   render() {
 
-    const { list: {order, items}, classes } = this.props;
+    const { list: { order, items }, classes } = this.props;
 
     let columns = [
       { id: 'code', numeric: false, label: 'Код', sortable: true },
@@ -142,7 +136,13 @@ class ItemsList extends Component {
                   <TableCell>{val.code}</TableCell>
                   <TableCell>{val.descr}</TableCell>
                   <TableCell numeric>{val.price}</TableCell>
-                  <TableCell><input value={val.qty} onChange={this.handleQtyChange} ref={this.setInputRef(i)} /></TableCell>
+                  <TableCell>
+                    <input
+                      value={val.qty}
+                      onChange={this.handleQtyChange}
+                      ref={this.setInputRef(i)}
+                    />
+                  </TableCell>
                 </TableRow>
               )
             }
@@ -172,12 +172,54 @@ const styles = {
     backgroundColor: "#f3ef97"
   },
   gridArea: {
-    gridArea: "table"
+    gridArea: "table",
+    height: "100%"
   },
   header: {
     backgroundColor: "#e0e0e0",
     height: "48px",
     fontWeight: "bold"
+  }
+}
+
+class ItemsList1 extends Component {
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch(fetchItems());
+
+  }
+  render() {
+    const { list: { order, items }, classes } = this.props;
+
+    let columns = [
+      { id: 'code', numeric: false, label: 'Код', sortable: true },
+      { id: 'descr', numeric: false, label: 'Наименование', sortable: true },
+      { id: 'price', numeric: true, label: 'Цена', sortable: true },
+      { id: 'qty', numeric: true, label: 'Количество', sortable: false }
+    ];
+
+    return (
+      <TableV
+        rowCount={items.length}
+        className={classes.gridArea}
+        rowGetter={({ index }) => items[index]}
+        width={300}
+        height={300}
+        headerHeight={20}
+        rowHeight={30}
+      >
+        {columns.map(col => (
+          <Column
+            key={col.id}
+            label={col.label}
+            dataKey={col.id}
+            //sortable={col.sortable}
+            width={100}
+          //onClick={this.createSortHandler(col.id)}
+          />
+        ))}
+      </TableV>
+    )
   }
 }
 

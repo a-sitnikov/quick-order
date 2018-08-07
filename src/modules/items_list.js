@@ -1,20 +1,16 @@
 import * as utils from '../utils'
 
 export const defaultState = {
-  currentRow: 0,
-  currentPage: 0,
-  rowsPerPage: 25,
   order: [
     { field: "descr", direction: "asc" }
   ],
-  rowCount: 100,
   items: []
 }
 
 export const RECIEVE  = 'RECIEVE_ITEMS';
 export const SORT     = 'SORT_ITEMS';
 export const ADD_SORT = 'ADD_SORT_ITEMS';
-export const CHANGE_CURRENT_ROW = 'CHANGE_CURRENT_ROW';
+export const SEARCH   = 'SEARCH_ITEMS';
 
 export default function reducer(state = defaultState, action){
 
@@ -62,11 +58,6 @@ export default function reducer(state = defaultState, action){
       };
     } 
     
-    case CHANGE_CURRENT_ROW: 
-    return {
-      ...state,
-      currentRow: action.payload
-    }
     default:
       return state;
   }
@@ -90,9 +81,9 @@ export const addSortItemsList = (orderBy) => ({
   payload: orderBy
 })
 
-export const changeCurrentRow = (currentRow) => ({
-  type: CHANGE_CURRENT_ROW,
-  payload: currentRow
+export const searchItemsList = (text) => ({
+  type: SEARCH,
+  payload: text
 })
 
 export const fetchItems = () => async (dispatch, getState, getFirebase) => {

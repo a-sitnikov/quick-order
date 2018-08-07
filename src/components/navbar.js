@@ -23,11 +23,10 @@ class NavBar extends Component {
       { path: '/profile', label: 'Профиль' },
       { path: '/help', label: 'Помощь' },
     ];
-    console.log(1, location)
 
     return (
       <AppBar position="static" color="default" className={classes.appbar}>
-        <div>
+        <div className={classes.flex}>
           {menuItems.map(val => (
             <Button
               key={val.path}
@@ -38,6 +37,12 @@ class NavBar extends Component {
               {val.label}
             </Button>
           ))}
+          <Button 
+            variant="outlined"
+            className={classes.exit}
+          >
+            Выйти
+          </Button>  
         </div>
       </AppBar>
     )
@@ -46,11 +51,14 @@ class NavBar extends Component {
 }
 
 const styles = theme => ({
-  active: {
-
+  flex: {
+    display: "flex"
   },
   appbar: {
-    padding: theme.spacing.unit
+    padding: theme.spacing.unit,
+  },
+  exit: {
+    marginLeft: "auto"
   }
 })
 

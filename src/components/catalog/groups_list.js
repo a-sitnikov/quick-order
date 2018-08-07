@@ -54,7 +54,7 @@ const mapStateToProps = (state) => {
 const styles = theme => ({
   groups: {
     gridArea: "groups",
-    padding: theme.spacing.unit
+    margin: theme.spacing.unit
   },
 });
 

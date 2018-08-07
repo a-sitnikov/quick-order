@@ -9,17 +9,13 @@ import { withStyles } from '@material-ui/core';
 
 class Catalog extends Component {
 
-  handleKeyDown = event => {
-
-  }
-
   render() {
 
     const { classes } = this.props;
 
     return (
-      <div className={classes.catalog} onKeyDown={this.handleKeyDown}>
-        <ItemsList />
+      <div className={classes.catalog}>
+        <ItemsList/>
         <CartInfo />
         <GropusList />
       </div>
@@ -32,11 +28,11 @@ const styles = theme => ({
   catalog: {
     display: "grid",
     gridTemplateColumns: "3fr 1fr",
-    gridTemplateRows: "100px  1fr",
+    gridTemplateRows: "48px  1fr",
     gridTemplateAreas:
       '"table cart" ' +
       '"table groups"',
-    padding: theme.spacing.unit
+    padding: theme.spacing.unit,
   }
 
 })

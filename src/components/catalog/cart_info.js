@@ -1,34 +1,89 @@
 import React, { Component } from 'react'
 import { compose } from 'redux'
+import { connect } from 'react-redux'
 
-import { withStyles } from '@material-ui/core';
+import { Link } from 'react-router-dom'
+import { Badge, withStyles } from '@material-ui/core';
 import ShoppingCart from '@material-ui/icons/ShoppingCart';
 
 class CartInfo extends Component {
   render() {
 
-    const { classes } = this.props;
+    const { cart, classes } = this.props;
+
+    let icon;
+    if (cart.count === 0)
+      icon = <ShoppingCart className={classes.icon} />
+    else
+      icon = (
+        <Badge badgeContent={cart.count} color="primary" classes={{ badge: classes.badge }}>
+          <ShoppingCart className={classes.icon} />
+        </Badge>
+      )
 
     return (
       <div id="cart" className={classes.cartInfo}>
-        <ShoppingCart className={classes.icon} />
+        <Link to="/cart" className={classes.link}>
+          {icon}
+          <div className={classes.text}>
+            <div className={classes.sum}>
+              Cумма {cart.sum} руб.
+            </div>
+            <div className={classes.count}>
+              {cart.count} позиций
+            </div>
+          </div>
+        </Link>
       </div>
     )
+  }
+}
+
+const mapStateToProps = (state) => {
+
+  const {
+    cart
+  } = state;
+
+  return {
+    cart
   }
 }
 
 const styles = theme => ({
   cartInfo: {
     padding: theme.spacing.unit,
-    border: "1px solid #e0e0e0",
-    gridArea: "cart"
+    gridArea: "cart",
+    //borderBottom: "1px solid #e0e0e0",
+  },
+  link: {
+    display: "flex",
+    color: "black"
   },
   icon: {
-    width: 42,
-    height: 42
-  }
+    fontSize: 42,
+  },
+  text: {
+    marginLeft: 20,
+    marginTop: 5
+  },
+  sum: {
+    fontWeight: "bold"
+  },
+  count: {
+    fontSize: "80%"
+  },
+  badge: {
+    top: -10,
+    right: -10,
+    // The border color match the background color.
+    border: `2px solid ${
+      theme.palette.type === 'light' ? theme.palette.grey[200] : theme.palette.grey[900]
+    }`,
+  }  
 });
 
 export default compose(
-  withStyles(styles)
+  withStyles(styles),
+  connect(mapStateToProps)
 )(CartInfo);

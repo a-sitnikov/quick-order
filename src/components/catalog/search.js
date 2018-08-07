@@ -4,36 +4,71 @@ import { compose } from 'redux'
 import { FormControl, InputLabel, Input, InputAdornment, IconButton, withStyles } from '@material-ui/core';
 import { Search as SearchIcon, Clear } from '@material-ui/icons'
 
+import { searchItemsList } from '../../modules/items_list'
+
 class Search extends Component {
 
-  constructor(){
+  constructor() {
     super();
-    this.state = {text: ''}
+    this.state = { text: '' }
+  }
+
+  componentDidMount() {
+    window.addEventListener("keydown", this.focusInput);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("keydown", this.focusInput);
+  }
+
+  focusInput = event => {
+    if (event.key === 'F3' || (event.key === 'f' && event.ctrlKey)) {
+      event.preventDefault();
+      if (this.inputRef)
+        this.inputRef.focus();
+    }
+
+  }
+
+  handleKeyDown = event => {
+    if (event.key === 'Enter') {
+      const { dispatch } = this.props;
+      dispatch(searchItemsList(this.inputRef.value));
+    }
   }
 
   handleChange = event => {
-    this.setState({text: event.target.value})
+    this.setState({ text: event.target.value })
   }
 
   handleSearch = event => {
-
+    const { dispatch } = this.props;
+    dispatch(searchItemsList(this.inputRef.value));
   }
 
   handleClearSearch = event => {
-    this.setState({text: ''})
+    this.setState({ text: '' })
   }
 
   render() {
     const { classes } = this.props;
     return (
       <div className={classes.search}>
-        <FormControl>
-          <InputLabel htmlFor="search">Поиск</InputLabel>
+        <FormControl style={{ width: "100%" }}>
+          <InputLabel
+            htmlFor="search"
+            shrink
+          >
+            Поиск
+          </InputLabel>
           <Input
             id="search"
             type='text'
+            placeholder="Для поиска нажмите F3 или Ctrl+F"
             value={this.state.text}
             onChange={this.handleChange}
+            onKeyPress={this.handleKeyDown}
+            inputRef={node => this.inputRef = node}
             endAdornment={
               <InputAdornment position="end">
                 <IconButton

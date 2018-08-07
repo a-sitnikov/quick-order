@@ -8,6 +8,7 @@ import { store } from './store'
 
 import App from './App'
 import './index.css';
+import 'react-virtualized/styles.css'
 
 const Root = ({ store }) => (
   <Provider store={store}>

@@ -24,7 +24,7 @@ class App extends Component {
     if (fbConfig.apiKey) {
       if (login.uid)
         return (
-          <div>
+          <div style={{height: "100%"}}>
             <NavBar />
             <Switch>
               <Route exact path='/' component={Catalog} />
