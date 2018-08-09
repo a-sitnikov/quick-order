@@ -6,9 +6,9 @@ import TextField from '@material-ui/core/TextField';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListSubheader from '@material-ui/core/ListSubheader';
-import { withStyles } from '@material-ui/core';
+import { withStyles, Chip } from '@material-ui/core';
 
-import { fetchGroups } from '../../modules/groups_list'
+import { fetchGroups, selectGroup, deselectGroup, clearGroupsSelection } from '../../modules/groups_list'
 
 class GropusList extends Component {
 
@@ -17,17 +17,42 @@ class GropusList extends Component {
     dispatch(fetchGroups());
   }
 
+  handleGroupClick = guid => event => {
+    const { dispatch } = this.props;
+    dispatch(selectGroup(guid));
+  }
+
+  handleHeaderClick = event => {
+    const { dispatch } = this.props;
+    dispatch(clearGroupsSelection());
+  }
+
+  handleDelete = guid => vent => {
+    const { dispatch } = this.props;
+    dispatch(deselectGroup(guid));
+  }
+
   render() {
 
-    const { items, classes } = this.props;
+    const { items, selected, classes } = this.props;
 
     return (
       <div id="groups" className={classes.groups}>
         <TextField fullWidth={true} label="Фильтр категорий" />
+        {selected.length > 0 && (
+          <div>
+            {selected.map(val => (
+              <Chip key={val.guid}
+                label={val.descr}
+                onDelete={this.handleDelete(val.guid)}
+              />
+            ))}
+          </div>
+        )}
         <List>
-          <ListSubheader>Все категории</ListSubheader>
+          <ListSubheader onClick={this.handleHeaderClick} className={classes.item}>Все категории</ListSubheader>
           {items.map(item => (
-            <ListItem key={item.guid}>
+            <ListItem key={item.guid} onClick={this.handleGroupClick(item.guid)} className={classes.item}>
               {item.descr}
             </ListItem>
           ))}
@@ -40,14 +65,14 @@ class GropusList extends Component {
 
 const mapStateToProps = (state) => {
 
-  const { 
+  const {
     items,
-    selected 
+    selected
   } = state.groups;
 
   return {
-    items, 
-    selected 
+    items,
+    selected
   }
 }
 
@@ -56,6 +81,9 @@ const styles = theme => ({
     gridArea: "groups",
     margin: theme.spacing.unit
   },
+  item: {
+    cursor: "pointer",
+  }
 });
 
 

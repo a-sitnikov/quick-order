@@ -8,7 +8,7 @@ import { TableSortLabel } from '@material-ui/core';
 import { Column, Table as TableV } from 'react-virtualized';
 
 import Search from './search'
-import { fetchItems, sortItemsList, addSortItemsList } from '../../modules/items_list'
+import { fetchItems, setSortItemsList, addSortItemsList } from '../../modules/items_list'
 
 const HeaderCell = ({ id, order, sortable, className, children, onClick }) => {
 
@@ -52,21 +52,28 @@ class ItemsList extends Component {
   }
 
   componentDidUpdate() {
-    if (this.currentInput)
+    if (this.currentInput) {
       this.currentInput.focus();
+      this.currentInput.select();
+    }  
   }
 
   handleKeyDown = (event) => {
 
-    if (event.key === 'ArrowDown' || event.key === 'Enter')
-      this.setState({
-        currentRow: this.state.currentRow + 1
-      })
+    if (event.key === 'ArrowDown' || event.key === 'Enter') {
+      event.preventDefault();
+      if (this.state.currentRow < this.props.list.items.length - 1) {
+        this.setState({
+          currentRow: this.state.currentRow + 1
+        })
+      }
 
-    else if (event.key === 'ArrowUp')
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
       this.setState({
         currentRow: Math.max(0, this.state.currentRow - 1)
       })
+    }
   }
 
   handleQtyChange = (event) => {
@@ -91,13 +98,13 @@ class ItemsList extends Component {
     if (event.ctrlKey) {
       dispatch(addSortItemsList(orderBy));
     } else {
-      dispatch(sortItemsList(orderBy));
+      dispatch(setSortItemsList(orderBy));
     }
   }
 
   render() {
 
-    const { list: { order, items }, classes } = this.props;
+    const { list: { order, items, filteredItems }, classes } = this.props;
 
     let columns = [
       { id: 'code', numeric: false, label: 'Код', sortable: true },
@@ -105,6 +112,9 @@ class ItemsList extends Component {
       { id: 'price', numeric: true, label: 'Цена', sortable: true },
       { id: 'qty', numeric: true, label: 'Количество', sortable: false }
     ]
+
+    let itemsArray = filteredItems === null ? items : filteredItems;
+
 
     return (
       <div className={classes.gridArea}>
@@ -126,7 +136,7 @@ class ItemsList extends Component {
             </TableRow>
           </TableHead>
           <TableBody>
-            {items.map((val, i) => {
+            {itemsArray.map((val, i) => {
               let className;
               if (i === this.state.currentRow) {
                 className = classes.active;
@@ -139,6 +149,8 @@ class ItemsList extends Component {
                   <TableCell>
                     <input
                       value={val.qty}
+                      type="number"
+                      style={{textAlign: "right"}}
                       onChange={this.handleQtyChange}
                       ref={this.setInputRef(i)}
                     />
@@ -179,47 +191,6 @@ const styles = {
     backgroundColor: "#e0e0e0",
     height: "48px",
     fontWeight: "bold"
-  }
-}
-
-class ItemsList1 extends Component {
-  componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch(fetchItems());
-
-  }
-  render() {
-    const { list: { order, items }, classes } = this.props;
-
-    let columns = [
-      { id: 'code', numeric: false, label: 'Код', sortable: true },
-      { id: 'descr', numeric: false, label: 'Наименование', sortable: true },
-      { id: 'price', numeric: true, label: 'Цена', sortable: true },
-      { id: 'qty', numeric: true, label: 'Количество', sortable: false }
-    ];
-
-    return (
-      <TableV
-        rowCount={items.length}
-        className={classes.gridArea}
-        rowGetter={({ index }) => items[index]}
-        width={300}
-        height={300}
-        headerHeight={20}
-        rowHeight={30}
-      >
-        {columns.map(col => (
-          <Column
-            key={col.id}
-            label={col.label}
-            dataKey={col.id}
-            //sortable={col.sortable}
-            width={100}
-          //onClick={this.createSortHandler(col.id)}
-          />
-        ))}
-      </TableV>
-    )
   }
 }
 

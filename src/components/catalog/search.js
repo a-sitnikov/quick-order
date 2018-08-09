@@ -4,7 +4,7 @@ import { compose } from 'redux'
 import { FormControl, InputLabel, Input, InputAdornment, IconButton, withStyles } from '@material-ui/core';
 import { Search as SearchIcon, Clear } from '@material-ui/icons'
 
-import { searchItemsList } from '../../modules/items_list'
+import { searchItemsList, clearSearchItemsList } from '../../modules/items_list'
 
 class Search extends Component {
 
@@ -43,11 +43,16 @@ class Search extends Component {
 
   handleSearch = event => {
     const { dispatch } = this.props;
-    dispatch(searchItemsList(this.inputRef.value));
+    if (this.inputRef.value)
+      dispatch(searchItemsList(this.inputRef.value));
+    else  
+      dispatch(clearSearchItemsList());
   }
 
   handleClearSearch = event => {
+    const { dispatch } = this.props;
     this.setState({ text: '' })
+    dispatch(clearSearchItemsList());
   }
 
   render() {
