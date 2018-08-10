@@ -12,7 +12,7 @@ export const ADD_SORT = 'ADD_SORT_ITEMS';
 export const SEARCH   = 'SEARCH_ITEMS';
 export const CLEAR_SEARCH = 'CLEAR_SEARCH_ITEMS';
 
-export const setSort = (state, field) => {
+export const setSortReducer = (state, field) => {
 
   const orderBy = state.order.find(val => val.field === field);
   let order = [];        
@@ -36,7 +36,7 @@ export const setSort = (state, field) => {
 
 }
 
-export const addSort = (state, field) => {
+export const addSortReducer = (state, field) => {
   const index = state.order.findIndex(val => val.field === field);
   let order = state.order.slice();        
   if (index === -1) {
@@ -51,7 +51,7 @@ export const addSort = (state, field) => {
   }
 }
 
-export const recieve = (state, items, prices) => {
+export const recieveReducer = (state, items, prices) => {
 
   let array = [];
   for (let key of Object.keys(items)) {
@@ -63,7 +63,7 @@ export const recieve = (state, items, prices) => {
   };
 }
 
-export const search = (state, text) => {
+export const searchReducer = (state, text) => {
   let reg = new RegExp(text, 'i');
   return {
     ...state,
@@ -71,7 +71,7 @@ export const search = (state, text) => {
   }
 }
 
-export const clearSearch = state => {
+export const clearSearchReducer = state => {
   return {
     ...state,
     filteredItems: null
@@ -82,15 +82,15 @@ export default function reducer(state = defaultState, action){
 
   switch (action.type) {
     case RECIEVE: 
-      return recieve(state, action.items, action.prices);
+      return recieveReducer(state, action.items, action.prices);
     case ADD_SORT: 
-      return addSort(state, action.payload);
+      return addSortReducer(state, action.payload);
     case SET_SORT: 
-      return setSort(state, action.payload);
+      return setSortReducer(state, action.payload);
     case SEARCH:
-      return search(state, action.payload);
+      return searchReducer(state, action.payload);
     case CLEAR_SEARCH:
-      return clearSearch(state);
+      return clearSearchReducer(state);
     default:
       return state;
   }

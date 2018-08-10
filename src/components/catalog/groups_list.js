@@ -2,13 +2,13 @@ import React, { Component } from 'react'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
 
-import TextField from '@material-ui/core/TextField';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListSubheader from '@material-ui/core/ListSubheader';
-import { withStyles, Chip } from '@material-ui/core';
+import { withStyles, FormControl, InputLabel, Input, InputAdornment, IconButton, Chip } from '@material-ui/core';
+import { Clear } from '@material-ui/icons';
 
-import { fetchGroups, selectGroup, deselectGroup, clearGroupsSelection } from '../../modules/groups_list'
+import { fetchGroups, selectGroup, deselectGroup, clearGroupsSelection, setSearchText } from '../../modules/groups_list'
 
 class GropusList extends Component {
 
@@ -32,26 +32,59 @@ class GropusList extends Component {
     dispatch(deselectGroup(guid));
   }
 
+  handleSearchChange = event => {
+    const { dispatch } = this.props;
+    dispatch(setSearchText(event.target.value));
+  }
+
+  handleClearSearch = event => {
+    const { dispatch } = this.props;
+    dispatch(setSearchText(''));
+  }
+
   render() {
 
-    const { items, selected, classes } = this.props;
+    const { searchText, items, selected, filteredItems, classes } = this.props;
+
+    let itemsArray = filteredItems === null ? items : filteredItems;
 
     return (
       <div id="groups" className={classes.groups}>
-        <TextField fullWidth={true} label="Фильтр категорий" />
+        <FormControl style={{ width: "100%" }}>
+          <InputLabel
+            htmlFor="search"
+          >
+            Фильтр категорий
+          </InputLabel>
+          <Input
+            type='text'
+            value={searchText}
+            onChange={this.handleSearchChange}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="Clear search"
+                  onClick={this.handleClearSearch}
+                >
+                  <Clear />
+                </IconButton>
+              </InputAdornment>
+            }
+          />
+        </FormControl>
         {selected.length > 0 && (
-          <div>
-            {selected.map(val => (
-              <Chip key={val.guid}
-                label={val.descr}
-                onDelete={this.handleDelete(val.guid)}
+          <div className={classes.selected}>
+            {selected.map(item => (
+              <Chip key={item.guid}
+                label={item.descr}
+                onDelete={this.handleDelete(item.guid)}
               />
             ))}
           </div>
         )}
         <List>
-          <ListSubheader onClick={this.handleHeaderClick} className={classes.item}>Все категории</ListSubheader>
-          {items.map(item => (
+          <ListSubheader onClick={this.handleHeaderClick} className={classes.header}>Все категории</ListSubheader>
+          {itemsArray.map(item => (
             <ListItem key={item.guid} onClick={this.handleGroupClick(item.guid)} className={classes.item}>
               {item.descr}
             </ListItem>
@@ -66,23 +99,34 @@ class GropusList extends Component {
 const mapStateToProps = (state) => {
 
   const {
+    searchText,
     items,
-    selected
+    selected,
+    filteredItems
   } = state.groups;
 
   return {
+    searchText,
     items,
-    selected
+    selected,
+    filteredItems
   }
 }
 
 const styles = theme => ({
+  header: {
+    fontWeight: "bold",
+    cursor: "pointer",
+  },
   groups: {
     gridArea: "groups",
-    margin: theme.spacing.unit
+    padding: theme.spacing.unit
   },
   item: {
     cursor: "pointer",
+  },
+  selected: {
+    padding: theme.spacing.unit
   }
 });
 

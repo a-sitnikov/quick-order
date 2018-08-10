@@ -5,8 +5,6 @@ import { compose } from 'redux'
 import { Table, TableBody, TableHead, TableRow, TableCell, withStyles } from '@material-ui/core';
 import { TableSortLabel } from '@material-ui/core';
 
-import { Column, Table as TableV } from 'react-virtualized';
-
 import Search from './search'
 import { fetchItems, setSortItemsList, addSortItemsList } from '../../modules/items_list'
 
