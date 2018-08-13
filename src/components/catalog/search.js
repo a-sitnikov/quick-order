@@ -4,7 +4,8 @@ import { compose } from 'redux'
 import { FormControl, InputLabel, Input, InputAdornment, IconButton, withStyles } from '@material-ui/core';
 import { Search as SearchIcon, Clear } from '@material-ui/icons'
 
-import { searchItemsList, clearSearchItemsList } from '../../modules/items_list'
+import { filterItemsList } from '../../modules/items_list'
+import { searchTextItemsList, clearSearchTextItemsList } from '../../modules/search_items'
 
 class Search extends Component {
 
@@ -23,6 +24,7 @@ class Search extends Component {
 
   focusInput = event => {
     if (event.key === 'F3' || (event.key === 'f' && event.ctrlKey)) {
+      console.log()
       event.preventDefault();
       if (this.inputRef)
         this.inputRef.focus();
@@ -33,30 +35,28 @@ class Search extends Component {
   handleKeyDown = event => {
     if (event.key === 'Enter') {
       const { dispatch } = this.props;
-      dispatch(searchItemsList(this.inputRef.value));
+      dispatch(filterItemsList());
     }
   }
 
   handleChange = event => {
-    this.setState({ text: event.target.value })
-  }
+    const { dispatch } = this.props;
+    dispatch(searchTextItemsList(event.target.value));
+}
 
   handleSearch = event => {
     const { dispatch } = this.props;
-    if (this.inputRef.value)
-      dispatch(searchItemsList(this.inputRef.value));
-    else  
-      dispatch(clearSearchItemsList());
-  }
+    dispatch(filterItemsList());
+}
 
   handleClearSearch = event => {
     const { dispatch } = this.props;
-    this.setState({ text: '' })
-    dispatch(clearSearchItemsList());
+    dispatch(clearSearchTextItemsList());
+    dispatch(filterItemsList());
   }
 
   render() {
-    const { classes } = this.props;
+    const { text, classes } = this.props;
     return (
       <div className={classes.search}>
         <FormControl style={{ width: "100%" }}>
@@ -70,10 +70,10 @@ class Search extends Component {
             id="search"
             type='text'
             placeholder="Для поиска нажмите F3 или Ctrl+F"
-            value={this.state.text}
+            value={text}
             onChange={this.handleChange}
             onKeyPress={this.handleKeyDown}
-            inputRef={node => this.inputRef = node}
+            inputRef = {node => this.inputRef = node}
             endAdornment={
               <InputAdornment position="end">
                 <IconButton
@@ -105,7 +105,18 @@ const styles = theme => ({
   }
 })
 
+const mapStateToProps = (state) => {
+
+  const {
+    searchItems: {text}
+  } = state;
+
+  return {
+    text
+  }
+}
+
 export default compose(
-  connect(),
+  connect(mapStateToProps),
   withStyles(styles)
 )(Search);

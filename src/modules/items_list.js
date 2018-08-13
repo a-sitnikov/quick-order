@@ -6,28 +6,53 @@ export const defaultState = {
   filteredItems: null
 }
 
-export const RECIEVE  = 'RECIEVE_ITEMS';
+export const RECIEVE = 'RECIEVE_ITEMS';
 export const SET_SORT = 'SORT_ITEMS';
 export const ADD_SORT = 'ADD_SORT_ITEMS';
-export const SEARCH   = 'SEARCH_ITEMS';
-export const CLEAR_SEARCH = 'CLEAR_SEARCH_ITEMS';
+export const FILTER = 'FILTER_ITEMS';
+
+export const getFilteredItems = (items, groups, searchText) => {
+  if (groups.length === 0 && searchText === '')
+    return null;
+
+  let reg = new RegExp(searchText, 'i')  
+  return items.filter(item => {
+
+    if (searchText)
+      if (!reg.test(item.descr))
+        return false;
+
+    if (groups.length > 0) {
+      let inGroups = false;
+      for (let group of groups) {
+        if (item.groups.some(guid => guid === group.guid)) {
+          inGroups = true;
+          break;
+        }  
+      }
+      return inGroups;
+    }
+
+    return true;
+  });
+}
 
 export const setSortReducer = (state, field) => {
 
   const orderBy = state.order.find(val => val.field === field);
-  let order = [];        
+  let order = [];
   if (orderBy === undefined) {
     order.push({
-      field, 
+      field,
       direction: "asc"
     })
   } else {
     order = [{
-      field: orderBy.field, 
+      field: orderBy.field,
       direction: changeDirection(orderBy.direction)
     }];
   }
-  
+
   return {
     ...state,
     order,
@@ -38,9 +63,9 @@ export const setSortReducer = (state, field) => {
 
 export const addSortReducer = (state, field) => {
   const index = state.order.findIndex(val => val.field === field);
-  let order = state.order.slice();        
+  let order = state.order.slice();
   if (index === -1) {
-    order.push({field, direction: "asc"});
+    order.push({ field, direction: "asc" });
   } else {
     order[index].direction = changeDirection(order[index].direction);
   }
@@ -55,7 +80,7 @@ export const recieveReducer = (state, items, prices) => {
 
   let array = [];
   for (let key of Object.keys(items)) {
-    array.push({'guid': key, ...items[key], price: prices[key]})
+    array.push({ 'guid': key, ...items[key], price: prices[key] })
   }
   return {
     ...state,
@@ -63,34 +88,24 @@ export const recieveReducer = (state, items, prices) => {
   };
 }
 
-export const searchReducer = (state, text) => {
-  let reg = new RegExp(text, 'i');
+export const filterReducer = (state, filteredItems) => {
   return {
     ...state,
-    filteredItems: state.items.filter(val => reg.test(val.descr))
+    filteredItems
   }
 }
 
-export const clearSearchReducer = state => {
-  return {
-    ...state,
-    filteredItems: null
-  }
-}
-
-export default function reducer(state = defaultState, action){
+export default function reducer(state = defaultState, action) {
 
   switch (action.type) {
-    case RECIEVE: 
+    case RECIEVE:
       return recieveReducer(state, action.items, action.prices);
-    case ADD_SORT: 
+    case ADD_SORT:
       return addSortReducer(state, action.payload);
-    case SET_SORT: 
+    case SET_SORT:
       return setSortReducer(state, action.payload);
-    case SEARCH:
-      return searchReducer(state, action.payload);
-    case CLEAR_SEARCH:
-      return clearSearchReducer(state);
+    case FILTER:
+      return filterReducer(state, action.payload);
     default:
       return state;
   }
@@ -115,15 +130,13 @@ export const addSortItemsList = (orderBy) => ({
   payload: orderBy
 })
 
-export const searchItemsList = (text) => ({
-  type: SEARCH,
-  payload: text
-})
-
-export const clearSearchItemsList = () => ({
-  type: CLEAR_SEARCH
-})
-
+export const filterItemsList = () => (dispatch, getState, getFirebase) => {
+  const state = getState();
+  dispatch({
+    type: FILTER,
+    payload: getFilteredItems(state.list.items, state.groups.selected, state.searchItems.text)
+  });
+}
 
 export const fetchItems = () => async (dispatch, getState, getFirebase) => {
 

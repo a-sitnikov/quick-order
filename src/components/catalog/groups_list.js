@@ -9,6 +9,7 @@ import { withStyles, FormControl, InputLabel, Input, InputAdornment, IconButton,
 import { Clear } from '@material-ui/icons';
 
 import { fetchGroups, selectGroup, deselectGroup, clearGroupsSelection, setSearchText } from '../../modules/groups_list'
+import { filterItemsList } from '../../modules/items_list'
 
 class GropusList extends Component {
 
@@ -20,16 +21,19 @@ class GropusList extends Component {
   handleGroupClick = guid => event => {
     const { dispatch } = this.props;
     dispatch(selectGroup(guid));
+    dispatch(filterItemsList());
   }
 
   handleHeaderClick = event => {
     const { dispatch } = this.props;
     dispatch(clearGroupsSelection());
+    dispatch(filterItemsList());
   }
 
   handleDelete = guid => vent => {
     const { dispatch } = this.props;
     dispatch(deselectGroup(guid));
+    dispatch(filterItemsList());
   }
 
   handleSearchChange = event => {
