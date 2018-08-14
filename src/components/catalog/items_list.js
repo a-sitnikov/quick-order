@@ -2,8 +2,12 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { compose } from 'redux'
 
-import { Table, TableBody, TableHead, TableRow, TableCell, withStyles } from '@material-ui/core';
+import { throttle } from 'lodash'
+
+import { Table, TableBody, TableHead, TableRow, TableCell, withStyles, TableFooter } from '@material-ui/core';
 import { TableSortLabel } from '@material-ui/core';
+
+import classnames from 'classnames'
 
 import Search from './search'
 import { fetchItems, setSortItemsList, addSortItemsList } from '../../modules/items_list'
@@ -38,7 +42,10 @@ class ItemsList extends Component {
   constructor() {
     super();
     this.state = {
-      currentRow: 0
+      currentRow: 0,
+      startIndex: 0,
+      endIndex: 14,
+      count: 15
     }
     this.inputs = [];
   }
@@ -53,28 +60,59 @@ class ItemsList extends Component {
     if (this.currentInput) {
       this.currentInput.focus();
       this.currentInput.select();
-    }  
-  }
-
-  handleKeyDown = (event) => {
-
-    if (event.key === 'ArrowDown' || event.key === 'Enter') {
-      event.preventDefault();
-      if (this.state.currentRow < this.props.list.items.length - 1) {
-        this.setState({
-          currentRow: this.state.currentRow + 1
-        })
-      }
-
-    } else if (event.key === 'ArrowUp') {
-      event.preventDefault();
-      this.setState({
-        currentRow: Math.max(0, this.state.currentRow - 1)
-      })
     }
   }
 
-  handleQtyChange = (event) => {
+  setCurrentRow = currentRow => {
+
+    const length = this.props.list.items.length;
+    if (currentRow < 0 || currentRow > this.props.list.items.length)
+      return;
+
+    let { startIndex, endIndex, count } = this.state;
+
+    if (currentRow < startIndex && currentRow >= 0) {
+      startIndex = currentRow;
+      endIndex = startIndex + count - 1;
+    } else if (currentRow > endIndex && currentRow < length) {
+      endIndex = currentRow;
+      startIndex = endIndex - count + 1;
+    }
+
+    this.setState({
+      currentRow,
+      startIndex,
+      endIndex
+    })
+  }
+
+  setCurrentRowThrottled = throttle(this.setCurrentRow, 100);
+
+  handleKeyDown = event => {
+
+    if (event.key === 'ArrowDown' || event.key === 'Enter') {
+      event.preventDefault();
+      let newCurrentRow = this.state.currentRow + 1;
+      this.setCurrentRowThrottled(newCurrentRow);
+
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      let newCurrentRow = this.state.currentRow - 1;
+      this.setCurrentRowThrottled(newCurrentRow);
+    }
+  }
+
+  handleWheel = event => {
+    let newCurrentRow;
+    if (event.nativeEvent.deltaY > 0)
+      newCurrentRow = this.state.currentRow + 1;
+    else
+      newCurrentRow = this.state.currentRow - 1;
+
+    this.setCurrentRowThrottled(newCurrentRow);
+  }
+
+  handleQtyChange = event => {
 
   }
 
@@ -113,11 +151,41 @@ class ItemsList extends Component {
 
     let itemsArray = filteredItems === null ? items : filteredItems;
 
+    let rows = [];
+    const endIndex = Math.min(this.state.endIndex, itemsArray.length - 1);
+    for (let i = this.state.startIndex; i <= endIndex; i++) {
+      const item = itemsArray[i];
+      rows.push(
+        <TableRow 
+          key={item.guid} 
+          className={classnames({[classes.active]: i === this.state.currentRow})}
+          onClick={this.handleRowClik(i)}
+        >
+          <TableCell>{item.code}</TableCell>
+          <TableCell>{item.descr}</TableCell>
+          <TableCell numeric>{item.price}</TableCell>
+          <TableCell>
+            <input
+              value={item.qty}
+              type="number"
+              style={{ textAlign: "right" }}
+              onChange={this.handleQtyChange}
+              ref={this.setInputRef(i)}
+            />
+          </TableCell>
+        </TableRow>
+      )
+    }
 
     return (
-      <div className={classes.gridArea}>
+      <div className={classes.gridArea} >
         <Search />
-        <Table id="table" onKeyDown={this.handleKeyDown}>
+        <Table 
+          id="table" 
+          onKeyDown={this.handleKeyDown} 
+          onWheel={this.handleWheel}
+          padding="dense"
+        >
           <TableHead>
             <TableRow className={classes.header}>
               {columns.map(col => (
@@ -134,30 +202,11 @@ class ItemsList extends Component {
             </TableRow>
           </TableHead>
           <TableBody>
-            {itemsArray.map((val, i) => {
-              let className;
-              if (i === this.state.currentRow) {
-                className = classes.active;
-              }
-              return (
-                <TableRow key={i} className={className} onClick={this.handleRowClik(i)}>
-                  <TableCell>{val.code}</TableCell>
-                  <TableCell>{val.descr}</TableCell>
-                  <TableCell numeric>{val.price}</TableCell>
-                  <TableCell>
-                    <input
-                      value={val.qty}
-                      type="number"
-                      style={{textAlign: "right"}}
-                      onChange={this.handleQtyChange}
-                      ref={this.setInputRef(i)}
-                    />
-                  </TableCell>
-                </TableRow>
-              )
-            }
-            )}
+            {rows}
           </TableBody>
+          <TableFooter>
+            Всего записей: {itemsArray.length}
+          </TableFooter>
         </Table >
       </div>
     )
@@ -177,7 +226,7 @@ const mapStateToProps = (state) => {
   }
 }
 
-const styles = {
+const styles = theme => ({
   active: {
     backgroundColor: "#f3ef97"
   },
@@ -187,10 +236,10 @@ const styles = {
   },
   header: {
     backgroundColor: "#e0e0e0",
-    height: "48px",
+    height: 48,
     fontWeight: "bold"
   }
-}
+})
 
 export default compose(
   connect(mapStateToProps),
