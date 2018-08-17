@@ -13,10 +13,18 @@ import './index.css';
 const compactTheme = createMuiTheme({
   overrides: {
     MuiTableRow: {
-          root: {
-              height: 36
-          }
-      }
+      root: {
+        height: 36,
+        '&$selected': {
+          backgroundColor: "#f3ef97"          
+        }
+      },
+      head: {
+        height: 36,
+        fontWeight: "bold",
+        backgroundColor: "#e0e0e0"
+      },
+    }
   }
 });
 

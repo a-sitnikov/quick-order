@@ -123,7 +123,6 @@ const styles = theme => ({
     cursor: "pointer",
   },
   groups: {
-    gridArea: "groups",
     padding: theme.spacing.unit
   },
   item: {
@@ -136,6 +135,6 @@ const styles = theme => ({
 
 
 export default compose(
-  withStyles(styles),
-  connect(mapStateToProps)
+  connect(mapStateToProps),
+  withStyles(styles)
 )(GropusList);

@@ -7,12 +7,9 @@ import { throttle } from 'lodash'
 import { Table, TableBody, TableHead, TableRow, TableCell, withStyles, TableFooter } from '@material-ui/core';
 import { TableSortLabel } from '@material-ui/core';
 
-import classnames from 'classnames'
-
-import Search from './search'
 import { fetchItems, setSortItemsList, addSortItemsList } from '../../modules/items_list'
 
-const HeaderCell = ({ id, order, sortable, className, children, onClick }) => {
+const HeaderCell = ({ id, order, sortable, className, children, onClick, ...props }) => {
 
   const orderBy = order.find(val => val.field === id);
   const isActive = (orderBy !== undefined);
@@ -20,13 +17,13 @@ const HeaderCell = ({ id, order, sortable, className, children, onClick }) => {
 
   if (!sortable)
     return (
-      <TableCell >
+      <TableCell {...props}>
         {children}
       </TableCell>
     )
   else
     return (
-      <TableCell className={className}>
+      <TableCell className={className} {...props}>
         <TableSortLabel
           active={isActive}
           direction={direction}
@@ -65,8 +62,10 @@ class ItemsList extends Component {
 
   setCurrentRow = currentRow => {
 
-    const length = this.props.list.items.length;
-    if (currentRow < 0 || currentRow > this.props.list.items.length)
+    const { filteredItems, items } = this.props.list;
+
+    const length = (filteredItems || items).length - 1;
+    if (currentRow < 0 || currentRow > length)
       return;
 
     let { startIndex, endIndex, count } = this.state;
@@ -143,10 +142,10 @@ class ItemsList extends Component {
     const { list: { order, items, filteredItems }, classes } = this.props;
 
     let columns = [
-      { id: 'code', numeric: false, label: 'Код', sortable: true },
+      { id: 'code', numeric: false, label: 'Код', sortable: true, width: 100 },
       { id: 'descr', numeric: false, label: 'Наименование', sortable: true },
-      { id: 'price', numeric: true, label: 'Цена', sortable: true },
-      { id: 'qty', numeric: true, label: 'Количество', sortable: false }
+      { id: 'price', numeric: true, label: 'Цена', sortable: true, width: 80 },
+      { id: 'qty', numeric: true, label: 'Количество', sortable: false, width: 50 }
     ]
 
     let itemsArray = filteredItems === null ? items : filteredItems;
@@ -156,9 +155,9 @@ class ItemsList extends Component {
     for (let i = this.state.startIndex; i <= endIndex; i++) {
       const item = itemsArray[i];
       rows.push(
-        <TableRow 
-          key={item.guid} 
-          className={classnames({[classes.active]: i === this.state.currentRow})}
+        <TableRow
+          key={item.guid}
+          selected={i === this.state.currentRow}
           onClick={this.handleRowClik(i)}
         >
           <TableCell>{item.code}</TableCell>
@@ -168,7 +167,7 @@ class ItemsList extends Component {
             <input
               value={item.qty}
               type="number"
-              style={{ textAlign: "right" }}
+              className={classes.input}
               onChange={this.handleQtyChange}
               ref={this.setInputRef(i)}
             />
@@ -178,16 +177,13 @@ class ItemsList extends Component {
     }
 
     return (
-      <div className={classes.gridArea} >
-        <Search />
-        <Table 
-          id="table" 
-          onKeyDown={this.handleKeyDown} 
+        <Table
+          id="table"
+          onKeyDown={this.handleKeyDown}
           onWheel={this.handleWheel}
-          padding="dense"
         >
           <TableHead>
-            <TableRow className={classes.header}>
+            <TableRow>
               {columns.map(col => (
                 <HeaderCell
                   key={col.id}
@@ -195,6 +191,7 @@ class ItemsList extends Component {
                   order={order}
                   sortable={col.sortable}
                   onClick={this.createSortHandler(col.id)}
+                  style={{ width: col.width }}
                 >
                   {col.label}
                 </HeaderCell>
@@ -205,10 +202,13 @@ class ItemsList extends Component {
             {rows}
           </TableBody>
           <TableFooter>
-            Всего записей: {itemsArray.length}
+            <TableRow>
+              <TableCell colSpan={4}>
+                Всего записей: {itemsArray.length}
+              </TableCell>
+            </TableRow>
           </TableFooter>
         </Table >
-      </div>
     )
   }
 }
@@ -216,28 +216,18 @@ class ItemsList extends Component {
 const mapStateToProps = (state) => {
 
   const {
-    list,
-    cart
+    list
   } = state;
 
   return {
-    list,
-    cart
+    list
   }
 }
 
 const styles = theme => ({
-  active: {
-    backgroundColor: "#f3ef97"
-  },
-  gridArea: {
-    gridArea: "table",
-    height: "100%"
-  },
-  header: {
-    backgroundColor: "#e0e0e0",
-    height: 48,
-    fontWeight: "bold"
+  input: {
+    width: 65,
+    textAlign: "right"
   }
 })
 

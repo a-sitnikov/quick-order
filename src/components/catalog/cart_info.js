@@ -53,8 +53,6 @@ const mapStateToProps = (state) => {
 const styles = theme => ({
   cartInfo: {
     padding: theme.spacing.unit,
-    gridArea: "cart",
-    //borderBottom: "1px solid #e0e0e0",
   },
   link: {
     display: "flex",
@@ -84,6 +82,6 @@ const styles = theme => ({
 });
 
 export default compose(
-  withStyles(styles),
-  connect(mapStateToProps)
+  connect(mapStateToProps),
+  withStyles(styles)
 )(CartInfo);

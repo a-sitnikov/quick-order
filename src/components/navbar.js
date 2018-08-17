@@ -25,7 +25,7 @@ class NavBar extends Component {
     ];
 
     return (
-      <AppBar position="static" color="default" className={classes.appbar}>
+      <AppBar position="fixed" color="default" className={classes.appbar}>
         <div className={classes.flex}>
           {menuItems.map(val => (
             <Button
