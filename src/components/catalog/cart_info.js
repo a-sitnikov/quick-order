@@ -21,16 +21,24 @@ class CartInfo extends Component {
         </Badge>
       )
 
+    let countNoun = 'позиций';
+    if (cart.count % 100 >= 11 && cart.count % 100 <= 20)
+      countNoun = 'позиций';
+    else if (cart.count % 10 === 1)
+        countNoun = 'позиция'
+    else if (cart.count % 10 >= 2 && cart.count % 10 <= 4)
+        countNoun = 'позиции'
+
     return (
       <div id="cart" className={classes.cartInfo}>
         <Link to="/cart" className={classes.link}>
           {icon}
           <div className={classes.text}>
             <div className={classes.sum}>
-              Cумма {cart.sum} руб.
+              Cумма {cart.sum.toFixed(2)} руб.
             </div>
             <div className={classes.count}>
-              {cart.count} позиций
+              {cart.count} {countNoun}
             </div>
           </div>
         </Link>

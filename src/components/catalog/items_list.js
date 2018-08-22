@@ -8,6 +8,7 @@ import { Table, TableBody, TableHead, TableRow, TableCell, withStyles, TableFoot
 import { TableSortLabel } from '@material-ui/core';
 
 import { fetchItems, setSortItemsList, addSortItemsList } from '../../modules/items_list'
+import { changeQty } from '../../modules/cart'
 
 const HeaderCell = ({ id, order, sortable, className, children, onClick, ...props }) => {
 
@@ -111,8 +112,9 @@ class ItemsList extends Component {
     this.setCurrentRowThrottled(newCurrentRow);
   }
 
-  handleQtyChange = event => {
-
+  handleQtyChange = item => event => {
+    const { dispatch } = this.props;
+    dispatch(changeQty(item.guid, +event.target.value, item.price));
   }
 
   handleRowClik = currentRow => event => {
@@ -148,7 +150,7 @@ class ItemsList extends Component {
       { id: 'qty', numeric: true, label: 'Количество', sortable: false, width: 50 }
     ]
 
-    let itemsArray = filteredItems === null ? items : filteredItems;
+    let itemsArray = filteredItems || items;
 
     let rows = [];
     const endIndex = Math.min(this.state.endIndex, itemsArray.length - 1);
@@ -162,13 +164,13 @@ class ItemsList extends Component {
         >
           <TableCell>{item.code}</TableCell>
           <TableCell>{item.descr}</TableCell>
-          <TableCell numeric>{item.price}</TableCell>
+          <TableCell numeric>{item.price.toFixed(2)}</TableCell>
           <TableCell>
             <input
               value={item.qty}
               type="number"
               className={classes.input}
-              onChange={this.handleQtyChange}
+              onChange={this.handleQtyChange(item)}
               ref={this.setInputRef(i)}
             />
           </TableCell>
