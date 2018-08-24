@@ -8,7 +8,7 @@ import { AppBar, Button, withStyles } from '@material-ui/core';
 class NavBar extends Component {
 
   componentWillReceiveProps(props) {
-    console.log(props);
+    //console.log(props);
   }
 
   render() {

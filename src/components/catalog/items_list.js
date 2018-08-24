@@ -4,36 +4,11 @@ import { compose } from 'redux'
 
 import { throttle } from 'lodash'
 
-import { Table, TableBody, TableHead, TableRow, TableCell, withStyles, TableFooter } from '@material-ui/core';
-import { TableSortLabel } from '@material-ui/core';
+import { Table, TableBody, TableRow, TableCell, withStyles, TableFooter } from '@material-ui/core';
 
+import Header from '../common/table_header'
 import { fetchItems, setSortItemsList, addSortItemsList } from '../../modules/items_list'
 import { changeQty } from '../../modules/cart'
-
-const HeaderCell = ({ id, order, sortable, className, children, onClick, ...props }) => {
-
-  const orderBy = order.find(val => val.field === id);
-  const isActive = (orderBy !== undefined);
-  const direction = isActive ? orderBy.direction : "asc";
-
-  if (!sortable)
-    return (
-      <TableCell {...props}>
-        {children}
-      </TableCell>
-    )
-  else
-    return (
-      <TableCell className={className} {...props}>
-        <TableSortLabel
-          active={isActive}
-          direction={direction}
-          onClick={onClick}
-        >{children}
-        </TableSortLabel>
-      </TableCell>
-    )
-}
 
 class ItemsList extends Component {
 
@@ -45,7 +20,6 @@ class ItemsList extends Component {
       endIndex: 14,
       count: 15
     }
-    this.inputs = [];
   }
 
   componentDidMount() {
@@ -128,7 +102,7 @@ class ItemsList extends Component {
       this.currentInput = element;
   }
 
-  createSortHandler = orderBy => event => {
+  handleSort = (orderBy, event) => {
 
     const { dispatch } = this.props;
 
@@ -184,22 +158,11 @@ class ItemsList extends Component {
           onKeyDown={this.handleKeyDown}
           onWheel={this.handleWheel}
         >
-          <TableHead>
-            <TableRow>
-              {columns.map(col => (
-                <HeaderCell
-                  key={col.id}
-                  id={col.id}
-                  order={order}
-                  sortable={col.sortable}
-                  onClick={this.createSortHandler(col.id)}
-                  style={{ width: col.width }}
-                >
-                  {col.label}
-                </HeaderCell>
-              ))}
-            </TableRow>
-          </TableHead>
+          <Header 
+            columns={columns}
+            order={order}
+            onSort={this.handleSort}
+          />
           <TableBody>
             {rows}
           </TableBody>

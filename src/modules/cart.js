@@ -3,28 +3,34 @@ export const CHANGE_QTY = 'CHANGE_QTY';
 export const defaultState = {
   count: 0,
   sum: 0,
-  items: {}
+  itemsByKey: {},
+  items: [],
+  order: []
 }
 
 export const changeQtyReducer = (state, guid, qty, price) => {
 
-  let items = Object.assign(state.items);
+  let itemsByKey = Object.assign(state.itemsByKey);
 
   if (qty === 0)
-    delete items[guid];
+    delete itemsByKey[guid];
   else {  
-    let item = items[guid] || {};
+    let item = itemsByKey[guid] || {};
+    item.guid = guid;
     item.qty = qty;
     item.price = price;
     item.sum = Math.round(100 * qty * item.price) / 100;
-    items[guid] = item;
+    itemsByKey[guid] = item;
   }
 
-  const count = Object.keys(items).length;
-  const sum = Object.keys(items).reduce((acc, val) => acc + items[val].sum, 0);
+  const count = Object.keys(itemsByKey).length;
+  const sum = Object.keys(itemsByKey).reduce((acc, val) => acc + itemsByKey[val].sum, 0);
+  let items = [];
+  Object.keys(itemsByKey).forEach(val => items.push(itemsByKey[val]));
 
   return {
     ...state,
+    itemsByKey,
     items,
     count,
     sum
