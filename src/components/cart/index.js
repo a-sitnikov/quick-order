@@ -4,19 +4,18 @@ import { compose } from 'redux'
 import { Table, TableBody, TableRow, TableCell, withStyles, TableFooter } from '@material-ui/core';
 
 import Header from '../common/table_header'
+import { setSortCart, addSortCart } from '../../modules/cart'
 
 class Cart extends Component {
 
   handleSort = (orderBy, event) => {
 
     const { dispatch } = this.props;
-    /*
         if (event.ctrlKey) {
-          dispatch(addSortItemsList(orderBy));
+          dispatch(addSortCart(orderBy));
         } else {
-          dispatch(setSortItemsList(orderBy));
+          dispatch(setSortCart(orderBy));
         }
-        */
   }
 
   render() {

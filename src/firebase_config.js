@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { compose } from 'redux'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 
 import { Button, withStyles, Typography } from '@material-ui/core';
 import { reduxForm, Field } from 'redux-form'
@@ -16,6 +17,7 @@ class FirebaseConfig extends Component {
       apiKey: 'AIzaSyCEtQzT05g5wz-gftuna8GSzXuLxkMI7f4',
       databaseURL: 'https://quick-order-e285f.firebaseio.com'
     }));
+    this.props.history.push('/');
   }
 
   render() {
@@ -94,5 +96,6 @@ export default compose(
     onSubmit
   }),
   withStyles(styles),
+  withRouter,
   connect(state => ({error: state.fbConfig.error}))
 )(FirebaseConfig);

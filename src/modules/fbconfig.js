@@ -2,9 +2,19 @@ export const CONNECT = 'FIREBASE_CONNECT';
 export const ERROR = 'FIREBASE_CONNECT_ERROR';
 
 export const defaultState = {
-  appKey: null,
+  apiKey: null,
   databaseURL: null,
   error: null
+}
+
+export const getSavedState = () => {
+  const fbConfigText = localStorage.getItem('fbConfig');
+  try {
+    return JSON.parse(fbConfigText);
+  } catch(e) {
+    return defaultState
+  }    
+
 }
 
 export default function reducer(state = defaultState, action) {
@@ -39,10 +49,7 @@ export const fbConnectError = (message) => ({
 
 export const fbDoConnect = (fbConfig) => async (dispatch, getState, getFirebase) => {
 
-  const firebase = getFirebase();
-
   try {
-    await firebase.initializeApp(fbConfig);
     localStorage.setItem('fbConfig', JSON.stringify(fbConfig));
     dispatch(fbConnect(fbConfig));
   } catch (error) {
@@ -60,8 +67,8 @@ export const fbCheckConnected = () => async (dispatch, getState, getFirebase) =>
       const fbConfig = JSON.parse(fbConfigText)
       dispatch(fbConnect(fbConfig));
 
-      const firebase = getFirebase();
-      await firebase.initializeApp(fbConfig);
+      //const firebase = getFirebase();
+      //await firebase.initializeApp(fbConfig);
 
     } catch (error) {
       console.log(error.message);

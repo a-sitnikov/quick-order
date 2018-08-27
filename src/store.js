@@ -5,6 +5,8 @@ import firebase from 'firebase/app';
 import 'firebase/database'
 import 'firebase/auth'
 
+import { getSavedState as fbConfig_getSavedState } from './modules/fbconfig'
+
 // eslint-disable-next-line 
 import { createLogger } from 'redux-logger'
 
@@ -23,4 +25,7 @@ const createStoreWithFirebase = compose(
 )(createStore)
 
 // Create store with reducers and initial state
-export const store = createStoreWithFirebase(rootReducer)
+let initialState = {
+  fbConfig: fbConfig_getSavedState()
+};
+export const store = createStoreWithFirebase(rootReducer, initialState)

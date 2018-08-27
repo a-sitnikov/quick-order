@@ -3,49 +3,40 @@ import { Switch, Route, withRouter } from 'react-router-dom'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
 
-import NavBar from './components/navbar';
 import Catalog from './components/catalog';
 import Cart from './components/cart';
 import Login from './components/login';
 import FirebaseConfig from './firebase_config';
-import { fbCheckConnected } from './modules/fbconfig';
+import MyRedirect from './components/redirect'
 
 class App extends Component {
 
-  componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch(fbCheckConnected());
-  }
-
   render() {
 
-    const { login, fbConfig } = this.props;
-
-    if (fbConfig.apiKey) {
-      if (login.uid)
-        return (
-          <div style={{height: "100%"}}>
-            <NavBar />
-            <Switch>
-              <Route exact path='/' component={Catalog} />
-              <Route path='/cart' component={Cart} />
-            </Switch>
-          </div>        
-        )  
-      else 
-        return <Login />
-    } else {
-      return <FirebaseConfig />
-    }
-
-  }  
-}  
+    const { apiKey, userId } = this.props;
+    
+    return (
+      <Switch>
+        <Route exact path='/'
+          render={(props) => <MyRedirect apiKey={apiKey} userId={userId} component={Catalog} showNavbar />}
+        />
+        <Route path='/cart'
+          render={(props) => <MyRedirect apiKey={apiKey} userId={userId} component={Cart} showNavbar />}
+        />
+        <Route path='/login'
+          render={(props) => <MyRedirect apiKey={apiKey} component={Login} />}
+        />
+        <Route path='/fbconfig' component={FirebaseConfig} />
+      </Switch>
+    )
+  }
+}
 
 const mapStateToProps = (state) => {
 
   return {
-    login: state.login,
-    fbConfig: state.fbConfig
+    userId: state.login.uid,
+    apiKey: state.fbConfig.apiKey
   }
 
 }

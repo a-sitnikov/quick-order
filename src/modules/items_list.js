@@ -39,19 +39,7 @@ export const getFilteredItems = (items, groups, searchText) => {
 
 export const setSortReducer = (state, field) => {
 
-  const orderBy = state.order.find(val => val.field === field);
-  let order = [];
-  if (orderBy === undefined) {
-    order.push({
-      field,
-      direction: "asc"
-    })
-  } else {
-    order = [{
-      field: orderBy.field,
-      direction: changeDirection(orderBy.direction)
-    }];
-  }
+  const order = utils.setSort(state.order, field);
 
   return {
     ...state,
@@ -62,18 +50,15 @@ export const setSortReducer = (state, field) => {
 }
 
 export const addSortReducer = (state, field) => {
-  const index = state.order.findIndex(val => val.field === field);
-  let order = state.order.slice();
-  if (index === -1) {
-    order.push({ field, direction: "asc" });
-  } else {
-    order[index].direction = changeDirection(order[index].direction);
-  }
+
+  const order = utils.addSort(state.order, field);
+
   return {
     ...state,
     order,
     items: utils.sortArray(state.items, order)
-  }
+  };
+
 }
 
 export const recieveReducer = (state, items, prices) => {
@@ -111,8 +96,6 @@ export default function reducer(state = defaultState, action) {
   }
 
 }
-
-const changeDirection = orderDirection => orderDirection === "asc" ? "desc" : "asc";
 
 export const recieveItems = (items, prices) => ({
   type: RECIEVE,

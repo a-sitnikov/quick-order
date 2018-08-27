@@ -56,6 +56,8 @@ export const doLogout = () => async (dispatch, getState, getFirebase) => {
 export const doLogin = ({ email, password }) => async (dispatch, getState, getFirebase) => {
 
   const firebase = getFirebase();
+  console.log(getState())
+  await firebase.initializeApp(getState().fbConfig);
 
   try {
 
@@ -72,6 +74,8 @@ export const doLogin = ({ email, password }) => async (dispatch, getState, getFi
 export const checkLogin = () => async (dispatch, getState, getFirebase) => {
 
   const firebase = getFirebase();
+  await firebase.initializeApp(getState().fbConfig);
+
   firebase.auth().onAuthStateChanged((user) => {
     if (user) {
       dispatch(loginComplete(user.email, user.uid));

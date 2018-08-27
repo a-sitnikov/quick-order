@@ -30,7 +30,7 @@ const styles = theme => ({
 class Login extends Component {
 
   componentDidMount() {
-    this.props.dispatch(checkLogin());
+    //this.props.dispatch(checkLogin());
   }
 
   render() {

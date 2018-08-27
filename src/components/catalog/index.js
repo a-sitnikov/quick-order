@@ -15,7 +15,7 @@ class Catalog extends Component {
     const { classes } = this.props;
 
     return (
-      <div className={classes.catalog}>
+      <div className={classnames("container", classes.catalog)}>
         <div className={classnames("flex-column", classes.leftPanel)}>
           <Search />
           <ItemsList />
@@ -34,8 +34,7 @@ const styles = theme => ({
   catalog: {
     display: "flex",
     flexDirection: "row",
-    padding: theme.spacing.unit,
-    marginTop: 37 + 2 * theme.spacing.unit
+    padding: theme.spacing.unit
   },
   leftPanel: {
     flex: "1 1 70%",

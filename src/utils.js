@@ -38,3 +38,29 @@ export const sortArray = (array, order) => {
     return 0;
   })
 }
+
+export const changeDirection = orderDirection => orderDirection === "asc" ? "desc" : "asc";
+
+export const setSort = (sort, field) => {
+
+  const orderBy = sort.find(val => val.field === field) || {};
+  const direction = changeDirection(orderBy.direction);
+
+  return [{
+    field,
+    direction
+  }];
+}
+
+export const addSort = (sort, field) => {
+  
+  const index = sort.findIndex(val => val.field === field);
+  
+  let newSort = sort.slice();
+  if (index === -1) {
+    newSort.push({ field, direction: "asc" });
+  } else {
+    newSort[index].direction = changeDirection(newSort[index].direction);
+  }
+  return newSort;
+}
