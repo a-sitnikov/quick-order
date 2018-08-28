@@ -4,6 +4,7 @@ export const ERROR = 'FIREBASE_CONNECT_ERROR';
 export const defaultState = {
   apiKey: null,
   databaseURL: null,
+  isDemo: false,
   error: null
 }
 

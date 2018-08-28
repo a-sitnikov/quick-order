@@ -4,7 +4,7 @@ export const ERROR = 'LOGIN_ERROR';
 
 export const defaultState = {
   uid: null,
-  error: null
+  errorText: null
 }
 
 export default function reducer(state = defaultState, action) {
@@ -15,7 +15,7 @@ export default function reducer(state = defaultState, action) {
         ...state,
         uid: action.uid,
         email: action.email,
-        error: null
+        errorText: null
       }
     case LOGOUT:
       return defaultState;
@@ -23,7 +23,7 @@ export default function reducer(state = defaultState, action) {
     case ERROR:
       return {
         ...state,
-        error: action.payload
+        errorText: action.payload
       }
     default:
       return state;
@@ -56,8 +56,8 @@ export const doLogout = () => async (dispatch, getState, getFirebase) => {
 export const doLogin = ({ email, password }) => async (dispatch, getState, getFirebase) => {
 
   const firebase = getFirebase();
-  console.log(getState())
-  await firebase.initializeApp(getState().fbConfig);
+  if (firebase.apps.length === 0)
+    await firebase.initializeApp(getState().fbConfig);
 
   try {
 
@@ -71,15 +71,3 @@ export const doLogin = ({ email, password }) => async (dispatch, getState, getFi
   }
 }
 
-export const checkLogin = () => async (dispatch, getState, getFirebase) => {
-
-  const firebase = getFirebase();
-  await firebase.initializeApp(getState().fbConfig);
-
-  firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-      dispatch(loginComplete(user.email, user.uid));
-    }  
-  })
-
-}

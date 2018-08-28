@@ -1,21 +1,22 @@
 import React from 'react';
-import { Redirect } from 'react-router-dom'
+import { Redirect, withRouter } from 'react-router-dom'
 
 import NavBar from './navbar'
 
-export default ({ apiKey, userId, component, showNavbar, ...props }) => {
+const MyRedirect = ({ apiKey, userId, component: Component, showNavbar, ...props }) => {
 
   if (apiKey === null)
     return <Redirect to="/fbconfig" />
 
   if (userId === null)
-    return <Redirect to="/login" />
-
-  const Component = component;
+    return <Redirect to={{
+      pathname: "/login",
+      state: { from: props.location }
+    }} />
 
   if (showNavbar)
     return (
-      <div style={{ height: "100%" }}>
+      <div style={{ height: "100%", paddingTop: 53 }}>
         <NavBar />
         <Component {...props} />
       </div>
@@ -23,3 +24,5 @@ export default ({ apiKey, userId, component, showNavbar, ...props }) => {
   else
     return <Component {...props} />
 }
+
+export default withRouter(MyRedirect)

@@ -1,12 +1,13 @@
 import React, { Component } from 'react'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
+import { Redirect, withRouter } from 'react-router-dom'
 
 import { reduxForm, Field } from 'redux-form'
 import { Paper, Button, withStyles, Typography } from '@material-ui/core';
 
 import CustomTextField from '../components/common/custom_textfield'
-import { doLogin, checkLogin } from '../modules/login'
+import { doLogin } from '../modules/login'
 
 const styles = theme => ({
   container: {
@@ -24,18 +25,27 @@ const styles = theme => ({
   },
   buttonBar: {
     marginTop: theme.spacing.unit,
-  }
+  },
+  error: {
+    margin: theme.spacing.unit,
+    color: "red"
+  }  
 });
 
 class Login extends Component {
 
-  componentDidMount() {
-    //this.props.dispatch(checkLogin());
-  }
-
   render() {
 
-    const { classes, handleSubmit, error } = this.props;
+    const { classes, handleSubmit, errorText, uid, location } = this.props;
+
+    if (uid) {
+      const { from } = location.state || { from: { pathname: "/" } };
+      if (from.pathname === 'login' || from.pathname === 'fbconfig')
+        return <Redirect to='/' />
+      else  
+        return <Redirect to={from} />
+    }  
+
     return (
       <form onSubmit={handleSubmit}>
         <Paper className={classes.panel} elevation={10}>
@@ -53,7 +63,7 @@ class Login extends Component {
             type="password"
             fullWidth
           />
-          {error && <div>{error}</div>}
+          {errorText && <div className={classes.error}>{errorText}</div>}
           <div className={classes.buttonBar}>
             <Button
               color="primary"
@@ -71,25 +81,28 @@ class Login extends Component {
 }
 
 const onSubmit = (values, dispatch, props) => {
-  dispatch(doLogin(values));
+  dispatch(doLogin(values))
 }
 
 const mapStateToProps = (state) => {
 
-  const { 
-    error 
-  } = state.login;
-
+  const { fbConfig: { isDemo }, login: { errorText, uid } } = state;
   return {
-    error 
+    uid,
+    errorText,
+    initialValues: {
+      email: isDemo ? "alfa1@alfa.com" : "",
+      password: isDemo ? "123456" : ""
+    }
   }
 }
 
 export default compose(
+  connect(mapStateToProps),
+  withRouter,
   reduxForm({ 
     form: 'LOGIN_FORM',
     onSubmit
   }),
-  withStyles(styles),
-  connect(mapStateToProps)
+  withStyles(styles)
 )(Login)

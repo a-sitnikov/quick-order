@@ -15,7 +15,8 @@ class FirebaseConfig extends Component {
     const { dispatch } = this.props;
     dispatch(fbDoConnect({
       apiKey: 'AIzaSyCEtQzT05g5wz-gftuna8GSzXuLxkMI7f4',
-      databaseURL: 'https://quick-order-e285f.firebaseio.com'
+      databaseURL: 'https://quick-order-e285f.firebaseio.com',
+      isDemo: true
     }));
     this.props.history.push('/');
   }
@@ -54,7 +55,7 @@ class FirebaseConfig extends Component {
           </Button>
         </div>
         {error && <div>{error}</div>}
-        <p style={{ marginTop: '50px' }}>Где найти <span style={{ fontWeight: 'bold' }}>apiKey</span> и  <span style={{ fontWeight: 'bold' }}>databaseURL</span> своего приложения?</p>
+        <p style={{ marginTop: '50px' }}>Где найти <b>apiKey</b> и <b>databaseURL</b> своего приложения?</p>
         <div style={{ marginTop: '30px' }}>
           <img alt='Поясняющая картинка' src='https://firebasestorage.googleapis.com/v0/b/quick-order-de84c.appspot.com/o/settings-fb.png?alt=media&token=858e1c69-97e7-4241-88a4-8b8e6422c1b1' />
         </div>

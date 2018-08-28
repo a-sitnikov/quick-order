@@ -32,7 +32,7 @@ class Cart extends Component {
     ];
 
     return (
-      <div class={classes.container}>
+      <div className={classes.container}>
         Корзина
         <Table>
           <Header
@@ -43,7 +43,7 @@ class Cart extends Component {
           <TableBody>
             {
               items.map(item => (
-                <TableRow>
+                <TableRow key={item.guid}>
                 </TableRow>
               ))
             }

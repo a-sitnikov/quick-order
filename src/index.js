@@ -24,6 +24,11 @@ const compactTheme = createMuiTheme({
         fontWeight: "bold",
         backgroundColor: "#e0e0e0"
       },
+    },
+    MuiAppBar: {
+      root: {
+        flexDirection: "row"
+      }
     }
   }
 });
