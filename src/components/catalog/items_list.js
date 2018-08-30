@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { compose } from 'redux'
+import { Link } from 'react-router-dom'
 
 import { throttle } from 'lodash'
 
@@ -9,6 +10,8 @@ import { Table, TableBody, TableRow, TableCell, withStyles, TableFooter } from '
 import Header from '../common/table_header'
 import { fetchItems, setSortItemsList, addSortItemsList } from '../../modules/items_list'
 import { changeQty } from '../../modules/cart'
+
+import { format } from '../../utils'
 
 class ItemsList extends Component {
 
@@ -88,7 +91,7 @@ class ItemsList extends Component {
 
   handleQtyChange = item => event => {
     const { dispatch } = this.props;
-    dispatch(changeQty(item.guid, +event.target.value, item.price));
+    dispatch(changeQty(item, +event.target.value));
   }
 
   handleRowClik = currentRow => event => {
@@ -115,7 +118,7 @@ class ItemsList extends Component {
 
   render() {
 
-    const { list: { order, items, filteredItems }, classes } = this.props;
+    const { list: { order, items, filteredItems }, cart, classes } = this.props;
 
     let columns = [
       { id: 'code', numeric: false, label: 'Код', sortable: true, width: 100 },
@@ -130,6 +133,7 @@ class ItemsList extends Component {
     const endIndex = Math.min(this.state.endIndex, itemsArray.length - 1);
     for (let i = this.state.startIndex; i <= endIndex; i++) {
       const item = itemsArray[i];
+      const cartItem = cart.itemsByKey[item.guid] || {};
       rows.push(
         <TableRow
           key={item.guid}
@@ -137,11 +141,15 @@ class ItemsList extends Component {
           onClick={this.handleRowClik(i)}
         >
           <TableCell>{item.code}</TableCell>
-          <TableCell>{item.descr}</TableCell>
-          <TableCell numeric>{item.price.toFixed(2)}</TableCell>
+          <TableCell>
+            <Link to={`/items/${item.guid}`} className={classes.link}>
+              {item.descr}
+            </Link>
+          </TableCell>
+          <TableCell numeric>{format(item.price)}</TableCell>
           <TableCell>
             <input
-              value={item.qty}
+              value={cartItem.qty || ""}
               type="number"
               className={classes.input}
               onChange={this.handleQtyChange(item)}
@@ -153,27 +161,27 @@ class ItemsList extends Component {
     }
 
     return (
-        <Table
-          id="table"
-          onKeyDown={this.handleKeyDown}
-          onWheel={this.handleWheel}
-        >
-          <Header 
-            columns={columns}
-            order={order}
-            onSort={this.handleSort}
-          />
-          <TableBody>
-            {rows}
-          </TableBody>
-          <TableFooter>
-            <TableRow>
-              <TableCell colSpan={4}>
-                Всего записей: {itemsArray.length}
-              </TableCell>
-            </TableRow>
-          </TableFooter>
-        </Table >
+      <Table
+        id="table"
+        onKeyDown={this.handleKeyDown}
+        onWheel={this.handleWheel}
+      >
+        <Header
+          columns={columns}
+          order={order}
+          onSort={this.handleSort}
+        />
+        <TableBody>
+          {rows}
+        </TableBody>
+        <TableFooter>
+          <TableRow>
+            <TableCell colSpan={4}>
+              Всего записей: {itemsArray.length}
+            </TableCell>
+          </TableRow>
+        </TableFooter>
+      </Table >
     )
   }
 }
@@ -181,11 +189,13 @@ class ItemsList extends Component {
 const mapStateToProps = (state) => {
 
   const {
-    list
+    list,
+    cart
   } = state;
 
   return {
-    list
+    list,
+    cart
   }
 }
 
@@ -193,6 +203,9 @@ const styles = theme => ({
   input: {
     width: 65,
     textAlign: "right"
+  },
+  link: {
+    color: "rgba(0, 0, 0, 0.87)"
   }
 })
 

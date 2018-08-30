@@ -1,3 +1,4 @@
+import formatNumber from 'simple-format-number'
 
 export const getFirebaseData = (ref) => {
   return new Promise((resolve, reject) => {
@@ -63,4 +64,11 @@ export const addSort = (sort, field) => {
     newSort[index].direction = changeDirection(newSort[index].direction);
   }
   return newSort;
+}
+
+export const format = number => {
+  if (typeof(number) === "number")
+    return formatNumber(number, { fractionDigits: 2, symbols: { decimal: ',', grouping: '\xa0'}})  
+  else 
+    return number;
 }

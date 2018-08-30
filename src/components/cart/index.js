@@ -1,21 +1,29 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { compose } from 'redux'
+import { Link } from 'react-router-dom'
 import { Table, TableBody, TableRow, TableCell, withStyles, TableFooter } from '@material-ui/core';
 
 import Header from '../common/table_header'
-import { setSortCart, addSortCart } from '../../modules/cart'
+import { setSortCart, addSortCart, changeQty } from '../../modules/cart'
+
+import { format } from '../../utils'
 
 class Cart extends Component {
+
+  handleQtyChange = item => event => {
+    const { dispatch } = this.props;
+    dispatch(changeQty(item, +event.target.value, false));
+  }
 
   handleSort = (orderBy, event) => {
 
     const { dispatch } = this.props;
-        if (event.ctrlKey) {
-          dispatch(addSortCart(orderBy));
-        } else {
-          dispatch(setSortCart(orderBy));
-        }
+    if (event.ctrlKey) {
+      dispatch(addSortCart(orderBy));
+    } else {
+      dispatch(setSortCart(orderBy));
+    }
   }
 
   render() {
@@ -32,8 +40,7 @@ class Cart extends Component {
     ];
 
     return (
-      <div className={classes.container}>
-        Корзина
+      <div>
         <Table>
           <Header
             columns={columns}
@@ -42,8 +49,22 @@ class Cart extends Component {
           />
           <TableBody>
             {
-              items.map(item => (
-                <TableRow key={item.guid}>
+              items.map((val, i) => (
+                <TableRow key={val.item.guid}>
+                  <TableCell>{i + 1}</TableCell>
+                  <TableCell>{val.item.code}</TableCell>
+                  <TableCell><Link to={`/items/${val.item.guid}`} className={classes.link}>{val.item.descr}</Link></TableCell>
+                  <TableCell numeric>{format(val.item.price)}</TableCell>
+                  <TableCell numeric>
+                    <input
+                      value={val.qty === 0 ? "" : val.qty}
+                      type="number"
+                      className={classes.input}
+                      onChange={this.handleQtyChange(val.item)}
+                    //ref={this.setInputRef(i)}
+                    />
+                  </TableCell>
+                  <TableCell numeric>{format(val.sum)}</TableCell>
                 </TableRow>
               ))
             }
@@ -69,9 +90,9 @@ const mapStateToProps = (state) => {
 }
 
 const styles = theme => ({
-  container: {
-    marginTop: 37 + 2 * theme.spacing.unit
-  },
+  link: {
+    color: "rgba(0, 0, 0, 0.87)"
+  }
 });
 
 

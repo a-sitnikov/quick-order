@@ -12,25 +12,29 @@ export const SET_SORT = 'SORT_CART';
 export const ADD_SORT = 'ADD_SORT_CART';
 export const CHANGE_QTY = 'CHANGE_QTY';
 
-export const changeQtyReducer = (state, guid, qty, price) => {
+export const changeQtyReducer = (state, item, qty, deleteOnNull) => {
 
   let itemsByKey = Object.assign(state.itemsByKey);
 
-  if (qty === 0)
-    delete itemsByKey[guid];
-  else {  
-    let item = itemsByKey[guid] || {};
-    item.guid = guid;
-    item.qty = qty;
-    item.price = price;
-    item.sum = Math.round(100 * qty * item.price) / 100;
-    itemsByKey[guid] = item;
+  if (qty === 0) {
+    if (deleteOnNull) 
+      delete itemsByKey[item.guid];
+    else {
+      itemsByKey[item.guid].qty = 0;
+      itemsByKey[item.guid].sum = 0;
+    }  
+  } else {  
+    let cartItem = itemsByKey[item.guid] || {};
+    cartItem.item = item;
+    cartItem.qty = qty;
+    cartItem.sum = Math.round(100 * qty * item.price) / 100;
+    itemsByKey[item.guid] = cartItem;
   }
 
-  const count = Object.keys(itemsByKey).length;
-  const sum = Object.keys(itemsByKey).reduce((acc, val) => acc + itemsByKey[val].sum, 0);
+  const count = Object.keys(itemsByKey).filter(key => itemsByKey[key].qty !== 0).length;
+  const sum = Object.keys(itemsByKey).reduce((acc, key) => acc + itemsByKey[key].sum, 0);
   let items = [];
-  Object.keys(itemsByKey).forEach(val => items.push(itemsByKey[val]));
+  Object.keys(itemsByKey).forEach(key => items.push(itemsByKey[key]));
 
   return {
     ...state,
@@ -42,11 +46,11 @@ export const changeQtyReducer = (state, guid, qty, price) => {
 
 }
 
-export const changeQty = (guid, qty, price) => ({
+export const changeQty = (item, qty, deleteOnNull = true) => ({
   type: CHANGE_QTY,
-  guid,
+  item,
   qty,
-  price
+  deleteOnNull
 })
 
 export const setSortReducer = (state, field) => {
@@ -82,7 +86,7 @@ export default function reducer(state = defaultState, action) {
     case ADD_SORT:
       return addSortReducer(state, action.payload);
     case CHANGE_QTY:
-      return changeQtyReducer(state, action.guid, action.qty, action.price)
+      return changeQtyReducer(state, action.item, action.qty)
     default:
       return state;
   }

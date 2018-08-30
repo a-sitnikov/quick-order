@@ -6,6 +6,8 @@ import { Link } from 'react-router-dom'
 import { Badge, withStyles } from '@material-ui/core';
 import ShoppingCart from '@material-ui/icons/ShoppingCart';
 
+import { format } from '../../utils'
+
 class CartInfo extends Component {
   render() {
 
@@ -35,7 +37,7 @@ class CartInfo extends Component {
           {icon}
           <div className={classes.text}>
             <div className={classes.sum}>
-              Cумма {cart.sum.toFixed(2)} руб.
+              Cумма {format(cart.sum)} руб.
             </div>
             <div className={classes.count}>
               {cart.count} {countNoun}
