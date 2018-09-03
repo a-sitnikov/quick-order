@@ -3,7 +3,28 @@ import * as utils from '../utils'
 export const defaultState = {
   order: [],
   items: [],
-  filteredItems: null
+  filteredItems: null,
+  isLoaded: false
+}
+
+export const getSavedState = () => {
+
+  const orderStr = localStorage.getItem('items/order');
+  let order;
+  if (orderStr)
+    try {
+      order = JSON.parse(orderStr)
+    } catch(e) {
+
+    } 
+
+  if (!order)
+    order = [];
+
+  return {
+    ...defaultState,
+    order,
+  }
 }
 
 export const RECIEVE = 'RECIEVE_ITEMS';
@@ -40,11 +61,12 @@ export const getFilteredItems = (items, groups, searchText) => {
 export const setSortReducer = (state, field) => {
 
   const order = utils.setSort(state.order, field);
+  localStorage.setItem('items/order', JSON.stringify(order));
 
   return {
     ...state,
     order,
-    items: utils.sortArray(state.items, order)
+    items: utils.sortAndCopyArray(state.items, order)
   };
 
 }
@@ -52,11 +74,12 @@ export const setSortReducer = (state, field) => {
 export const addSortReducer = (state, field) => {
 
   const order = utils.addSort(state.order, field);
-
+  localStorage.setItem('items/order', JSON.stringify(order));
+  
   return {
     ...state,
     order,
-    items: utils.sortArray(state.items, order)
+    items: utils.sortAndCopyArray(state.items, order)
   };
 
 }
@@ -67,9 +90,14 @@ export const recieveReducer = (state, items, prices) => {
   for (let key of Object.keys(items)) {
     array.push({ 'guid': key, ...items[key], price: prices[key] })
   }
+
+  if (state.order)
+    array.sort(utils.funcOrderBy(state.order))
+
   return {
     ...state,
-    items: array
+    items: array,
+    isLoaded: true
   };
 }
 
@@ -122,6 +150,10 @@ export const filterItemsList = () => (dispatch, getState, getFirebase) => {
 }
 
 export const fetchItems = () => async (dispatch, getState, getFirebase) => {
+
+  const state = getState();
+  if (state.isLoaded)
+    return;
 
   const firebase = getFirebase();
   const refItems = firebase.database().ref('items');

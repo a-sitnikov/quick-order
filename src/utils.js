@@ -16,8 +16,7 @@ export const objectToArray = (obj, keyName = 'guid') => {
   })
 }
 
-export const sortArray = (array, order) => {
-  return array.map(x => x).sort((a, b) => {
+export const funcOrderBy = order => (a, b) => {
     
     for (let val of order) {
       if (a[val.field] > b[val.field]) {
@@ -37,7 +36,10 @@ export const sortArray = (array, order) => {
     }
 
     return 0;
-  })
+}
+
+export const sortAndCopyArray = (array, order) => {
+  return array.slice().sort(funcOrderBy(order))
 }
 
 export const changeDirection = orderDirection => orderDirection === "asc" ? "desc" : "asc";

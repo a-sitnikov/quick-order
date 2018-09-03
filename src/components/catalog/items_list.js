@@ -142,7 +142,13 @@ class ItemsList extends Component {
         >
           <TableCell>{item.code}</TableCell>
           <TableCell>
-            <Link to={`/items/${item.guid}`} className={classes.link}>
+            <Link 
+              to={{
+                pathname: `/items/${item.guid}`,
+                state: { item }
+              }} 
+              className={classes.link}
+            >
               {item.descr}
             </Link>
           </TableCell>

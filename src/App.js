@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import Catalog from './components/catalog';
 import Cart from './components/cart';
 import Login from './components/login';
+import Item from './components/item';
 import FirebaseConfig from './firebase_config';
 import MyRedirect from './components/redirect'
 
@@ -23,6 +24,9 @@ class App extends Component {
         <Route path='/cart'
           render={(props) => <MyRedirect apiKey={apiKey} userId={userId} component={Cart} showNavbar />}
         />
+        <Route path='/items/:guid'
+          render={(props) => <MyRedirect apiKey={apiKey} component={Item} />}
+        />        
         <Route path='/login'
           render={(props) => <MyRedirect apiKey={apiKey} component={Login} />}
         />

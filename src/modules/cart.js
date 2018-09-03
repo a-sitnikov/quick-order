@@ -60,7 +60,7 @@ export const setSortReducer = (state, field) => {
   return {
     ...state,
     order,
-    items: utils.sortArray(state.items, order)
+    items: utils.sortAndCopyArray(state.items, order)
   };
 
 }
@@ -72,7 +72,7 @@ export const addSortReducer = (state, field) => {
   return {
     ...state,
     order,
-    items: utils.sortArray(state.items, order)
+    items: utils.sortAndCopyArray(state.items, order)
   };
 
 }
