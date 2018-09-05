@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 import { Badge, withStyles } from '@material-ui/core';
 import ShoppingCart from '@material-ui/icons/ShoppingCart';
 
-import { format } from '../../utils'
+import { format, stringWithNumber } from '../../utils'
 
 class CartInfo extends Component {
   render() {
@@ -23,14 +23,6 @@ class CartInfo extends Component {
         </Badge>
       )
 
-    let countNoun = 'позиций';
-    if (cart.count % 100 >= 11 && cart.count % 100 <= 20)
-      countNoun = 'позиций';
-    else if (cart.count % 10 === 1)
-        countNoun = 'позиция'
-    else if (cart.count % 10 >= 2 && cart.count % 10 <= 4)
-        countNoun = 'позиции'
-
     return (
       <div id="cart" className={classes.cartInfo}>
         <Link to="/cart" className={classes.link}>
@@ -40,7 +32,7 @@ class CartInfo extends Component {
               Cумма {format(cart.sum)} руб.
             </div>
             <div className={classes.count}>
-              {cart.count} {countNoun}
+              {cart.count} {stringWithNumber(cart.count, 'позиция', 'позиции', 'позиций')}
             </div>
           </div>
         </Link>

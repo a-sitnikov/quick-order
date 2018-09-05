@@ -2,12 +2,15 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { compose } from 'redux'
 import { Link } from 'react-router-dom'
-import { Table, TableBody, TableRow, TableCell, withStyles, TableFooter, Checkbox } from '@material-ui/core';
+import { Table, TableBody, TableRow, TableCell, withStyles, Checkbox,
+  Typography, Toolbar, IconButton, Tooltip } from '@material-ui/core';
+
+import { Delete as DeleteIcon } from '@material-ui/icons'
 
 import Header from '../common/table_header'
 import { setSortCart, addSortCart, changeQty } from '../../modules/cart'
 
-import { format } from '../../utils'
+import { format, stringWithNumber } from '../../utils'
 
 class Cart extends Component {
 
@@ -42,7 +45,7 @@ class Cart extends Component {
       items.forEach(val => checkedItems[val.item.guid] = true);
     }
 
-    this.setState({checkedItems});
+    this.setState({ checkedItems });
   }
 
   onSelectClick = item => event => {
@@ -52,7 +55,7 @@ class Cart extends Component {
       checkedItems[item.guid] = true;
     else
       delete checkedItems[item.guid];
-      
+
     this.setState({ checkedItems });
   }
 
@@ -70,7 +73,7 @@ class Cart extends Component {
     ];
 
     const numSelected = Object.keys(this.state.checkedItems).length;
-   
+
     return (
       <div>
         <Table>
@@ -120,6 +123,23 @@ class Cart extends Component {
             }
           </TableBody>
         </Table>
+        {numSelected > 0 && (
+          <Toolbar>
+            <div className={classes.title}>
+              <Typography color="inherit" variant="subheading">
+                Выделено {numSelected} {stringWithNumber(numSelected, 'позиция', 'позиции', 'позиций')}
+              </Typography>
+            </div>
+            <div className={classes.spacer} />
+            <div className={classes.actions}>
+              <Tooltip title="Удалить позиции">
+                <IconButton aria-label="Delete">
+                  <DeleteIcon />
+                </IconButton>
+              </Tooltip>
+            </div>
+          </Toolbar>
+        )}
       </div>
     )
   }
@@ -142,7 +162,20 @@ const mapStateToProps = (state) => {
 const styles = theme => ({
   link: {
     color: "rgba(0, 0, 0, 0.87)"
-  }
+  },
+  input: {
+    width: 65,
+    textAlign: "right"
+  },
+  spacer: {
+    flex: '1 1 100%',
+  },
+  actions: {
+    color: theme.palette.text.secondary,
+  },
+  title: {
+    flex: '0 0 auto',
+  },  
 });
 
 

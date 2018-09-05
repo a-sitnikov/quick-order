@@ -17,25 +17,25 @@ export const objectToArray = (obj, keyName = 'guid') => {
 }
 
 export const funcOrderBy = order => (a, b) => {
-    
-    for (let val of order) {
-      if (a[val.field] > b[val.field]) {
-        
-        if (val.direction === "asc")
-          return 1;
-        else  
-          return -1;
 
-      } else if (a[val.field] < b[val.field]) {
-        
-        if (val.direction === "asc")
-          return -1;
-        else  
-          return 1;
-      }
+  for (let val of order) {
+    if (a[val.field] > b[val.field]) {
+
+      if (val.direction === "asc")
+        return 1;
+      else
+        return -1;
+
+    } else if (a[val.field] < b[val.field]) {
+
+      if (val.direction === "asc")
+        return -1;
+      else
+        return 1;
     }
+  }
 
-    return 0;
+  return 0;
 }
 
 export const sortAndCopyArray = (array, order) => {
@@ -56,9 +56,9 @@ export const setSort = (sort, field) => {
 }
 
 export const addSort = (sort, field) => {
-  
+
   const index = sort.findIndex(val => val.field === field);
-  
+
   let newSort = sort.slice();
   if (index === -1) {
     newSort.push({ field, direction: "asc" });
@@ -69,8 +69,21 @@ export const addSort = (sort, field) => {
 }
 
 export const format = number => {
-  if (typeof(number) === "number")
-    return formatNumber(number, { fractionDigits: 2, symbols: { decimal: ',', grouping: '\xa0'}})  
-  else 
+  if (typeof (number) === "number")
+    return formatNumber(number, { fractionDigits: 2, symbols: { decimal: ',', grouping: '\xa0' } })
+  else
     return number;
+}
+
+export const stringWithNumber = (number, str1, str2, strMany) => {
+
+  let str = strMany;
+  if (number % 100 >= 11 && number % 100 <= 20)
+    str = strMany;
+  else if (number % 10 === 1)
+    str = str1
+  else if (number % 10 >= 2 && number % 10 <= 4)
+    str = str2
+
+  return str;
 }
