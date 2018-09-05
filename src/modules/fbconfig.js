@@ -10,11 +10,21 @@ export const defaultState = {
 
 export const getSavedState = () => {
   const fbConfigText = localStorage.getItem('fbConfig');
+  let fbconfig;
   try {
-    return JSON.parse(fbConfigText);
+    fbconfig = JSON.parse(fbConfigText);
   } catch(e) {
-    return defaultState
   }    
+
+  if (!fbconfig)
+    fbconfig = {};
+
+  return {
+    ...defaultState,
+    apiKey: fbconfig.apiKey,
+    databaseURL: fbconfig.databaseURL,
+    isDemo: fbconfig.isDemo
+  }
 
 }
 

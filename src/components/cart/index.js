@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { compose } from 'redux'
 import { Link } from 'react-router-dom'
-import { Table, TableBody, TableRow, TableCell, withStyles, TableFooter } from '@material-ui/core';
+import { Table, TableBody, TableRow, TableCell, withStyles, TableFooter, Checkbox } from '@material-ui/core';
 
 import Header from '../common/table_header'
 import { setSortCart, addSortCart, changeQty } from '../../modules/cart'
@@ -10,6 +10,13 @@ import { setSortCart, addSortCart, changeQty } from '../../modules/cart'
 import { format } from '../../utils'
 
 class Cart extends Component {
+
+  constructor() {
+    super();
+    this.state = {
+      checkedItems: {}
+    }
+  }
 
   handleQtyChange = item => event => {
     const { dispatch } = this.props;
@@ -26,6 +33,29 @@ class Cart extends Component {
     }
   }
 
+  onSelectAllClick = (event) => {
+
+    const { items } = this.props;
+
+    let checkedItems = {};
+    if (event.target.checked) {
+      items.forEach(val => checkedItems[val.item.guid] = true);
+    }
+
+    this.setState({checkedItems});
+  }
+
+  onSelectClick = item => event => {
+
+    let { checkedItems } = this.state;
+    if (event.target.checked)
+      checkedItems[item.guid] = true;
+    else
+      delete checkedItems[item.guid];
+      
+    this.setState({ checkedItems });
+  }
+
   render() {
 
     const { order, items, classes } = this.props;
@@ -39,6 +69,8 @@ class Cart extends Component {
       { id: 'sum', numeric: true, label: 'Сумма', sortable: true, width: 50 }
     ];
 
+    const numSelected = Object.keys(this.state.checkedItems).length;
+   
     return (
       <div>
         <Table>
@@ -46,14 +78,32 @@ class Cart extends Component {
             columns={columns}
             order={order}
             onSort={this.handleSort}
-          />
+          >
+            <TableCell padding="checkbox" style={{ width: 20 }}>
+              <Checkbox
+                indeterminate={numSelected > 0 && numSelected < items.length}
+                checked={numSelected > 0 && numSelected === items.length}
+                onChange={this.onSelectAllClick}
+              />
+            </TableCell>
+          </Header>
           <TableBody>
             {
               items.map((val, i) => (
                 <TableRow key={val.item.guid}>
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={this.state.checkedItems[val.item.guid] === true}
+                      onChange={this.onSelectClick(val.item)}
+                    />
+                  </TableCell>
                   <TableCell>{i + 1}</TableCell>
                   <TableCell>{val.item.code}</TableCell>
-                  <TableCell><Link to={`/items/${val.item.guid}`} className={classes.link}>{val.item.descr}</Link></TableCell>
+                  <TableCell>
+                    <Link to={`/items/${val.item.guid}`} className={classes.link}>
+                      {val.item.descr}
+                    </Link>
+                  </TableCell>
                   <TableCell numeric>{format(val.item.price)}</TableCell>
                   <TableCell numeric>
                     <input

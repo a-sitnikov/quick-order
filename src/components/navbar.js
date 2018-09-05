@@ -15,10 +15,6 @@ class NavBar extends Component {
     dispatch(doLogout());
   }
 
-  componentWillReceiveProps(props) {
-    console.log(props)
-  }
-
   render() {
 
     const { classes, location, login } = this.props;

@@ -11,10 +11,11 @@ class Header extends Component {
   }
 
   render() {
-    const { columns, order } = this.props;
+    const { columns, order, children } = this.props;
     return (
       <TableHead>
         <TableRow>
+          {children}
           {columns.map(col => (
             <HeaderCell
               key={col.id}
