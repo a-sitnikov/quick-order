@@ -5,7 +5,7 @@ import firebase from 'firebase/app';
 import 'firebase/database'
 import 'firebase/auth'
 
-import { getSavedState as fbConfig_getSavedState } from './modules/fbconfig'
+import { getSavedState as dbConfig_getSavedState } from './modules/dbconfig'
 import { getSavedState as list_getSavedState } from './modules/items_list'
 
 // eslint-disable-next-line 
@@ -27,7 +27,7 @@ const createStoreWithFirebase = compose(
 
 // Create store with reducers and initial state
 let initialState = {
-  fbConfig: fbConfig_getSavedState(),
+  dbConfig: dbConfig_getSavedState(),
   list: list_getSavedState()
 };
 

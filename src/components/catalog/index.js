@@ -20,7 +20,7 @@ class Catalog extends Component {
           <Search />
           <ItemsList />
         </div>
-        <div className="flex-column">
+        <div className={classnames("flex-column", classes.rightPanel)}>
           <CartInfo />
           <GropusList />
         </div>
@@ -38,7 +38,10 @@ const styles = theme => ({
   },
   leftPanel: {
     flex: "1 1 70%",
-  }
+  },
+  rightPanel: {
+    flex: "0 0 300px",
+  }  
 })
 
 export default withStyles(styles)(Catalog);

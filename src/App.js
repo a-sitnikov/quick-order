@@ -7,30 +7,30 @@ import Catalog from './components/catalog';
 import Cart from './components/cart';
 import Login from './components/login';
 import Item from './components/item';
-import FirebaseConfig from './firebase_config';
+import DBConfig from './components/dbconfig';
 import MyRedirect from './components/redirect'
 
 class App extends Component {
 
   render() {
 
-    const { apiKey, userId } = this.props;
+    const { dbtype, params, userId } = this.props;
     
     return (
       <Switch>
         <Route exact path='/'
-          render={(props) => <MyRedirect apiKey={apiKey} userId={userId} component={Catalog} showNavbar />}
+          render={(props) => <MyRedirect dbtype={dbtype} params={params} userId={userId} component={Catalog} showNavbar />}
         />
         <Route path='/cart'
-          render={(props) => <MyRedirect apiKey={apiKey} userId={userId} component={Cart} showNavbar />}
+          render={(props) => <MyRedirect dbtype={dbtype} params={params} userId={userId} component={Cart} showNavbar />}
         />
         <Route path='/items/:guid'
-          render={(props) => <MyRedirect apiKey={apiKey} component={Item} />}
+          render={(props) => <MyRedirect dbtype={dbtype} params={params} userId={userId} component={Item} />}
         />        
-        <Route path='/login'
-          render={(props) => <MyRedirect apiKey={apiKey} component={Login} />}
+        <Route path='/login' component={Login}
+          /*render={(props) => <MyRedirect dbtype={dbtype} params={params} userId={userId} component={Login} />}*/
         />
-        <Route path='/fbconfig' component={FirebaseConfig} />
+        <Route path='/dbconfig' component={DBConfig} />
       </Switch>
     )
   }
@@ -40,7 +40,8 @@ const mapStateToProps = (state) => {
 
   return {
     userId: state.login.uid,
-    apiKey: state.fbConfig.apiKey
+    dbtype: state.dbConfig.dbtype,
+    params: state.dbConfig.params
   }
 
 }

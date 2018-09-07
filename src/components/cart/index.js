@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { compose } from 'redux'
 import { Link } from 'react-router-dom'
-import { Table, TableBody, TableRow, TableCell, withStyles, Checkbox,
+import { Table, TableBody, TableRow, TableCell, TableFooter, withStyles, Checkbox,
   Typography, Toolbar, IconButton, Tooltip } from '@material-ui/core';
 
 import { Delete as DeleteIcon } from '@material-ui/icons'
@@ -61,7 +61,7 @@ class Cart extends Component {
 
   render() {
 
-    const { order, items, classes } = this.props;
+    const { order, items, sum, classes } = this.props;
 
     let columns = [
       { id: 'number', numeric: true, label: '#', sortable: false, width: 10 },
@@ -76,6 +76,7 @@ class Cart extends Component {
 
     return (
       <div>
+        <Typography className={classes.title}>Список всех заказанных позиций</Typography>
         <Table>
           <Header
             columns={columns}
@@ -122,6 +123,18 @@ class Cart extends Component {
               ))
             }
           </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TableCell colSpan={5}>
+                <b>Итого</b>
+              </TableCell>
+              <TableCell>
+              </TableCell>  
+              <TableCell>
+                <b>{format(sum)}</b>
+              </TableCell>  
+            </TableRow>  
+          </TableFooter>  
         </Table>
         {numSelected > 0 && (
           <Toolbar>
@@ -150,12 +163,14 @@ const mapStateToProps = (state) => {
 
   const {
     order,
-    items
+    items,
+    sum
   } = state.cart;
 
   return {
     order,
-    items
+    items,
+    sum
   }
 }
 

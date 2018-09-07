@@ -3,16 +3,29 @@ import { Redirect, withRouter } from 'react-router-dom'
 
 import NavBar from './navbar'
 
-const MyRedirect = ({ apiKey, userId, component: Component, showNavbar, ...props }) => {
+const MyRedirect = ({ dbtype, params, userId, component: Component, showNavbar, ...props }) => {
 
-  if (apiKey === null)
-    return <Redirect to="/fbconfig" />
+  if (dbtype === 'firebase') {
+    
+    if (params.apiKey){
+    } else
+      return <Redirect to="/dbconfig" />
+
+  } else if (dbtype === 'server') {
+    
+    if (params.url) {
+    } else
+      return <Redirect to="/dbconfig" />
+      
+  } else 
+    return <Redirect to="/dbconfig" />
 
   if (userId === null)
     return <Redirect to={{
       pathname: "/login",
       state: { from: props.location }
-    }} />
+    }}
+    />
 
   if (showNavbar)
     return (

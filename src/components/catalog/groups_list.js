@@ -129,7 +129,7 @@ const styles = theme => ({
     cursor: "pointer",
   },
   selected: {
-    padding: theme.spacing.unit
+    paddingTop: 2
   }
 });
 

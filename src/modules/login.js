@@ -46,28 +46,50 @@ export const loginError = (message) => ({
   payload: message
 })
 
-export const doLogout = () => async (dispatch, getState, getFirebase) => {
-  const firebase = getFirebase();
-  await firebase.auth().signOut();
-  dispatch(logoutComplete());
+export const doLogout = () => async (dispatch, getState, getRemoteDB) => {
 
-}
-
-export const doLogin = ({ email, password }) => async (dispatch, getState, getFirebase) => {
-
-  const firebase = getFirebase();
-  if (firebase.apps.length === 0)
-    await firebase.initializeApp(getState().fbConfig);
-
-  try {
-
-    await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-    const credential = await firebase.auth().signInWithEmailAndPassword(email, password);
-
-    dispatch(loginComplete(email, credential.user.uid));
-
-  } catch (error) {
-    dispatch(loginError(error.message));
+  const state = getState();
+  const dbtype = state.dbConfig.dbtype;
+  if (dbtype === 'firebase') {
+    const firebase = getRemoteDB();
+    await firebase.auth().signOut();
+    dispatch(logoutComplete());
   }
+
 }
 
+export const doLogin = ({ email, password }) => async (dispatch, getState, getRemoteDB) => {
+
+  const state = getState();
+  const dbtype = state.dbConfig.dbtype;
+  if (dbtype === 'firebase') {
+
+    const firebase = getRemoteDB();
+    await initializeFirebase(firebase, state.dbConfig.params)
+
+    try {
+
+      let credential = await doLoginFirebase(firebase, email, password)
+      dispatch(loginComplete(email, credential.user.uid));
+
+    } catch (error) {
+      dispatch(loginError(error.message));
+    }
+
+  } else if (dbtype === 'server') {
+
+  }
+
+}
+
+const initializeFirebase = async (firebase, params) => {
+  if (firebase.apps.length === 0)
+    await firebase.initializeApp(params);  
+}
+
+export const doLoginFirebase = async (firebase, email, password) => {
+
+  await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+  return await firebase.auth().signInWithEmailAndPassword(email, password);
+
+}

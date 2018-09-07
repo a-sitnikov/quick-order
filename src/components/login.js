@@ -40,7 +40,7 @@ class Login extends Component {
 
     if (uid) {
       const { from } = location.state || { from: { pathname: "/" } };
-      if (from.pathname === 'login' || from.pathname === 'fbconfig')
+      if (from.pathname === 'login' || from.pathname === 'dbconfig')
         return <Redirect to='/' />
       else  
         return <Redirect to={from} />
@@ -86,7 +86,9 @@ const onSubmit = (values, dispatch, props) => {
 
 const mapStateToProps = (state) => {
 
-  const { fbConfig: { isDemo }, login: { errorText, uid } } = state;
+  const { login: { errorText, uid } } = state;
+  const isDemo = state.dbConfig.params.isDemo;
+
   return {
     uid,
     errorText,

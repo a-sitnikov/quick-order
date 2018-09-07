@@ -27,9 +27,11 @@ const getFiltererItems = (items, selected, searchText) => {
 }
 
 export const recieveReducer = (state, itemsObject) => {
+  let items = utils.objectToArray(itemsObject);
+  items.sort(utils.funcOrderBy([{field: "descr", direction: "asc"}]));
   return {
     ...state,
-    items: utils.objectToArray(itemsObject)
+    items
   };
 }
 

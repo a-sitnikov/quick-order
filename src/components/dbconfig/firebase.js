@@ -5,19 +5,18 @@ import { withRouter } from 'react-router-dom'
 
 import { Button, withStyles, Typography } from '@material-ui/core';
 import { reduxForm, Field } from 'redux-form'
-import CustomTextField from './components/common/custom_textfield'
+import CustomTextField from '../common/custom_textfield'
 
-import { fbDoConnect } from './modules/fbconfig'
+import { fbDoConnect } from '../../modules/dbconfig'
 
 class FirebaseConfig extends Component {
 
   connectToDemo = () => {
     const { dispatch } = this.props;
-    dispatch(fbDoConnect({
-      apiKey: 'AIzaSyCEtQzT05g5wz-gftuna8GSzXuLxkMI7f4',
-      databaseURL: 'https://quick-order-e285f.firebaseio.com',
-      isDemo: true
-    }));
+    const apiKey = 'AIzaSyCEtQzT05g5wz-gftuna8GSzXuLxkMI7f4';
+    const databaseURL = 'https://quick-order-e285f.firebaseio.com';
+    const isDemo = true;
+    dispatch(fbDoConnect(apiKey, databaseURL, isDemo));
     this.props.history.push('/');
   }
 
@@ -98,5 +97,5 @@ export default compose(
   }),
   withStyles(styles),
   withRouter,
-  connect(state => ({error: state.fbConfig.error}))
+  connect(state => ({error: state.dbConfig.error}))
 )(FirebaseConfig);

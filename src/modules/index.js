@@ -6,7 +6,7 @@ import searchItems from './search_items'
 import groups from './groups_list'
 import cart from './cart'
 import login from './login'
-import fbConfig from './fbconfig'
+import dbConfig from './dbconfig'
 
 const rootReducer = combineReducers({
   list,
@@ -15,7 +15,7 @@ const rootReducer = combineReducers({
   cart,
   login,
   form,
-  fbConfig
+  dbConfig
 });
 
 export default rootReducer;
