@@ -1,4 +1,7 @@
-import React from 'react';
+import React from 'react'
+import { compose } from 'redux'
+import { connect } from 'react-redux'
+
 import { Redirect, withRouter } from 'react-router-dom'
 
 import NavBar from './navbar'
@@ -6,18 +9,18 @@ import NavBar from './navbar'
 const MyRedirect = ({ dbtype, params, userId, component: Component, showNavbar, ...props }) => {
 
   if (dbtype === 'firebase') {
-    
-    if (params.apiKey){
+
+    if (params.apiKey) {
     } else
       return <Redirect to="/dbconfig" />
 
   } else if (dbtype === 'server') {
-    
+
     if (params.url) {
     } else
       return <Redirect to="/dbconfig" />
-      
-  } else 
+
+  } else
     return <Redirect to="/dbconfig" />
 
   if (userId === null)
@@ -38,4 +41,13 @@ const MyRedirect = ({ dbtype, params, userId, component: Component, showNavbar, 
     return <Component {...props} />
 }
 
-export default withRouter(MyRedirect)
+const mapStateToProps = (state) => ({
+  dbtype: state.dbConfig.dbtype,
+  params: state.dbConfig.params,
+  userId: state.login.uid
+})
+
+export default compose(
+  withRouter,
+  connect(mapStateToProps)
+)(MyRedirect)

@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { Switch, Route, withRouter } from 'react-router-dom'
 import { compose } from 'redux'
-import { connect } from 'react-redux'
 
 import Catalog from './components/catalog';
 import Cart from './components/cart';
@@ -14,21 +13,19 @@ class App extends Component {
 
   render() {
 
-    const { dbtype, params, userId } = this.props;
-    
     return (
       <Switch>
         <Route exact path='/'
-          render={(props) => <MyRedirect dbtype={dbtype} params={params} userId={userId} component={Catalog} showNavbar />}
+          render={(props) => <MyRedirect component={Catalog} showNavbar />}
         />
         <Route path='/cart'
-          render={(props) => <MyRedirect dbtype={dbtype} params={params} userId={userId} component={Cart} showNavbar />}
+          render={(props) => <MyRedirect component={Cart} showNavbar />}
         />
         <Route path='/items/:guid'
-          render={(props) => <MyRedirect dbtype={dbtype} params={params} userId={userId} component={Item} />}
+          render={(props) => <MyRedirect component={Item} />}
         />        
         <Route path='/login' component={Login}
-          /*render={(props) => <MyRedirect dbtype={dbtype} params={params} userId={userId} component={Login} />}*/
+          /*render={(props) => <MyRedirect component={Login} />}*/
         />
         <Route path='/dbconfig' component={DBConfig} />
       </Switch>
@@ -36,17 +33,7 @@ class App extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
-
-  return {
-    userId: state.login.uid,
-    dbtype: state.dbConfig.dbtype,
-    params: state.dbConfig.params
-  }
-
-}
 
 export default compose(
-  withRouter,
-  connect(mapStateToProps)
+  withRouter
 )(App);

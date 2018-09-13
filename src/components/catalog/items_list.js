@@ -8,7 +8,7 @@ import { throttle } from 'lodash'
 import { Table, TableBody, TableRow, TableCell, withStyles, TableFooter } from '@material-ui/core';
 
 import Header from '../common/table_header'
-import { fetchItems, setSortItemsList, addSortItemsList } from '../../modules/items_list'
+import { setSortItemsList, addSortItemsList } from '../../modules/items_list'
 import { changeQty } from '../../modules/cart'
 
 import { format } from '../../utils'
@@ -23,12 +23,6 @@ class ItemsList extends Component {
       endIndex: 14,
       count: 15
     }
-  }
-
-  componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch(fetchItems());
-
   }
 
   componentDidUpdate() {
@@ -194,14 +188,9 @@ class ItemsList extends Component {
 
 const mapStateToProps = (state) => {
 
-  const {
-    list,
-    cart
-  } = state;
-
   return {
-    list,
-    cart
+    list: state.catalog.list,
+    cart: state.cart
   }
 }
 

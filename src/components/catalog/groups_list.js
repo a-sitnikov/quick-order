@@ -8,15 +8,10 @@ import ListSubheader from '@material-ui/core/ListSubheader';
 import { withStyles, FormControl, InputLabel, Input, InputAdornment, IconButton, Chip } from '@material-ui/core';
 import { Clear } from '@material-ui/icons';
 
-import { fetchGroups, selectGroup, deselectGroup, clearGroupsSelection, setSearchText } from '../../modules/groups_list'
+import { selectGroup, deselectGroup, clearGroupsSelection, setSearchText } from '../../modules/groups_list'
 import { filterItemsList } from '../../modules/items_list'
 
 class GropusList extends Component {
-
-  componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch(fetchGroups());
-  }
 
   handleGroupClick = guid => event => {
     const { dispatch } = this.props;
@@ -50,7 +45,7 @@ class GropusList extends Component {
 
     const { searchText, items, selected, filteredItems, classes } = this.props;
 
-    let itemsArray = filteredItems === null ? items : filteredItems;
+    let itemsArray = filteredItems || items;
 
     return (
       <div id="groups" className={classes.groups}>
@@ -107,7 +102,7 @@ const mapStateToProps = (state) => {
     items,
     selected,
     filteredItems
-  } = state.groups;
+  } = state.catalog.groups;
 
   return {
     searchText,

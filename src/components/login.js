@@ -34,6 +34,10 @@ const styles = theme => ({
 
 class Login extends Component {
 
+  componentDidMount() {
+
+  }
+
   render() {
 
     const { classes, handleSubmit, errorText, uid, location } = this.props;

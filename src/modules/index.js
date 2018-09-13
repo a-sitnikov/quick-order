@@ -1,17 +1,15 @@
 import { combineReducers } from 'redux'
 import { reducer as form  } from 'redux-form';
 
-import list from './items_list'
+import catalog from './catalog'
 import searchItems from './search_items'
-import groups from './groups_list'
 import cart from './cart'
 import login from './login'
 import dbConfig from './dbconfig'
 
 const rootReducer = combineReducers({
-  list,
+  catalog,
   searchItems,
-  groups,
   cart,
   login,
   form,
