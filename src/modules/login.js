@@ -46,18 +46,18 @@ export const loginError = (message) => ({
   payload: message
 })
 
-export const doLogout = () => async (dispatch, getState, remoteDB) => {
+export const doLogout = () => async (dispatch, getState, DB) => {
 
-  remoteDB.logout();
+  DB.remote.logout();
   dispatch(logoutComplete());
 
 }
 
-export const doLogin = ({ email, password }) => async (dispatch, getState, remoteDB) => {
+export const doLogin = ({ email, password }) => async (dispatch, getState, DB) => {
 
   try {
 
-    const credential = await remoteDB.login(email, password);
+    const credential = await DB.remote.login(email, password);
     dispatch(loginComplete(email, credential.user.uid));
 
   } catch (error) {

@@ -24,8 +24,8 @@ class App extends Component {
         <Route path='/items/:guid'
           render={(props) => <MyRedirect component={Item} />}
         />        
-        <Route path='/login' component={Login}
-          /*render={(props) => <MyRedirect component={Login} />}*/
+        <Route path='/login' 
+          render={(props) => <MyRedirect component={Login} />}
         />
         <Route path='/dbconfig' component={DBConfig} />
       </Switch>

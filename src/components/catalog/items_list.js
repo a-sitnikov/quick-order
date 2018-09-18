@@ -8,7 +8,7 @@ import { throttle } from 'lodash'
 import { Table, TableBody, TableRow, TableCell, withStyles, TableFooter } from '@material-ui/core';
 
 import Header from '../common/table_header'
-import { setSortItemsList, addSortItemsList } from '../../modules/items_list'
+import { setSortItems, addSortItems } from '../../modules/catalog/items_list'
 import { changeQty } from '../../modules/cart'
 
 import { format } from '../../utils'
@@ -34,7 +34,7 @@ class ItemsList extends Component {
 
   setCurrentRow = currentRow => {
 
-    const { filteredItems, items } = this.props.list;
+    const { filteredItems, items } = this.props;
 
     const length = (filteredItems || items).length - 1;
     if (currentRow < 0 || currentRow > length)
@@ -104,15 +104,15 @@ class ItemsList extends Component {
     const { dispatch } = this.props;
 
     if (event.ctrlKey) {
-      dispatch(addSortItemsList(orderBy));
+      dispatch(addSortItems(orderBy));
     } else {
-      dispatch(setSortItemsList(orderBy));
+      dispatch(setSortItems(orderBy));
     }
   }
 
   render() {
 
-    const { list: { order, items, filteredItems }, cart, classes } = this.props;
+    const { order, items, filteredItems , cart, classes } = this.props;
 
     let columns = [
       { id: 'code', numeric: false, label: 'Код', sortable: true, width: 100 },
@@ -188,8 +188,12 @@ class ItemsList extends Component {
 
 const mapStateToProps = (state) => {
 
+  const { items, filteredItems, order } = state.catalog.list;
+
   return {
-    list: state.catalog.list,
+    items,
+    filteredItems,
+    order,
     cart: state.cart
   }
 }

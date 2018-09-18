@@ -8,37 +8,37 @@ import ListSubheader from '@material-ui/core/ListSubheader';
 import { withStyles, FormControl, InputLabel, Input, InputAdornment, IconButton, Chip } from '@material-ui/core';
 import { Clear } from '@material-ui/icons';
 
-import { selectGroup, deselectGroup, clearGroupsSelection, setSearchText } from '../../modules/groups_list'
-import { filterItemsList } from '../../modules/items_list'
+import { selectGroup, deselectGroup, clearGroupsSelection, searchTextGroups } from '../../modules/catalog/groups_list'
+import { filterItems } from '../../modules/catalog/items_list'
 
 class GropusList extends Component {
 
   handleGroupClick = guid => event => {
     const { dispatch } = this.props;
     dispatch(selectGroup(guid));
-    dispatch(filterItemsList());
+    dispatch(filterItems());
   }
 
   handleHeaderClick = event => {
     const { dispatch } = this.props;
     dispatch(clearGroupsSelection());
-    dispatch(filterItemsList());
+    dispatch(filterItems());
   }
 
   handleDelete = guid => vent => {
     const { dispatch } = this.props;
     dispatch(deselectGroup(guid));
-    dispatch(filterItemsList());
+    dispatch(filterItems());
   }
 
   handleSearchChange = event => {
     const { dispatch } = this.props;
-    dispatch(setSearchText(event.target.value));
+    dispatch(searchTextGroups(event.target.value));
   }
 
   handleClearSearch = event => {
     const { dispatch } = this.props;
-    dispatch(setSearchText(''));
+    dispatch(searchTextGroups(''));
   }
 
   render() {

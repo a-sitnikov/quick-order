@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import { Redirect, withRouter } from 'react-router-dom'
 
 import NavBar from './navbar'
+import Login from './login'
 
 const MyRedirect = ({ dbtype, params, userId, component: Component, showNavbar, ...props }) => {
 
@@ -24,11 +25,7 @@ const MyRedirect = ({ dbtype, params, userId, component: Component, showNavbar, 
     return <Redirect to="/dbconfig" />
 
   if (userId === null)
-    return <Redirect to={{
-      pathname: "/login",
-      state: { from: props.location }
-    }}
-    />
+    return <Login />
 
   if (showNavbar)
     return (

@@ -1,4 +1,4 @@
-import * as utils from '../utils'
+import * as utils from '../../utils'
 
 export const defaultState = {
   searchText: '',
@@ -11,7 +11,7 @@ export const RECIEVE = 'RECIEVE_GROUPS';
 export const SELECT = 'SELECT_GROUP';
 export const DESELECT = 'DESELECT_GROUP';
 export const CLEAR_SELECTION = 'CLEAR_GROUPS_SELECTION';
-export const SEARCH_TEXT = 'SEARCH_TEXT';
+export const SEARCH_TEXT = 'SEARCH_TEXT_GROUPS';
 
 const getFiltererItems = (items, selected, searchText) => {
   return items.filter(val => {
@@ -115,17 +115,7 @@ export const clearGroupsSelection = () => ({
   type: CLEAR_SELECTION
 })
 
-export const setSearchText = (text) => ({
+export const searchTextGroups = (text) => ({
   type: SEARCH_TEXT,
   payload: text
 })
-
-
-export const fetchGroups = () => async (dispatch, getState, getFirebase) => {
-
-  const firebase = getFirebase();
-  const ref = firebase.database().ref('groups');
-  const response = await utils.getFirebaseData(ref);
-
-  dispatch(recieveGroups(response));
-}

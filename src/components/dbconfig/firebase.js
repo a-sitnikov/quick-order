@@ -17,7 +17,8 @@ class FirebaseConfig extends Component {
     const databaseURL = 'https://quick-order-e285f.firebaseio.com';
     const isDemo = true;
     dispatch(fbDoConnect(apiKey, databaseURL, isDemo));
-    this.props.history.push('/');
+    // full reload window to initialize remoteDB
+    window.location.pathname = '/'
   }
 
   render() {

@@ -4,8 +4,7 @@ import { compose } from 'redux'
 import { FormControl, InputLabel, Input, InputAdornment, IconButton, withStyles } from '@material-ui/core';
 import { Search as SearchIcon, Clear } from '@material-ui/icons'
 
-import { filterItemsList } from '../../modules/items_list'
-import { searchTextItemsList, clearSearchTextItemsList } from '../../modules/search_items'
+import { searchTextItems, filterItems } from '../../modules/catalog/items_list'
 
 class Search extends Component {
 
@@ -35,24 +34,24 @@ class Search extends Component {
   handleKeyDown = event => {
     if (event.key === 'Enter') {
       const { dispatch } = this.props;
-      dispatch(filterItemsList());
+      dispatch(filterItems());
     }
   }
 
   handleChange = event => {
     const { dispatch } = this.props;
-    dispatch(searchTextItemsList(event.target.value));
+    dispatch(searchTextItems(event.target.value));
 }
 
   handleSearch = event => {
     const { dispatch } = this.props;
-    dispatch(filterItemsList());
+    dispatch(filterItems());
 }
 
   handleClearSearch = event => {
     const { dispatch } = this.props;
-    dispatch(clearSearchTextItemsList());
-    dispatch(filterItemsList());
+    dispatch(searchTextItems(''));
+    dispatch(filterItems());
   }
 
   render() {
@@ -107,12 +106,8 @@ const styles = theme => ({
 
 const mapStateToProps = (state) => {
 
-  const {
-    searchItems: {text}
-  } = state;
-
   return {
-    text
+    text: state.catalog.list.searchText
   }
 }
 
