@@ -69,7 +69,7 @@ export const recieveCatalogAction = (items, groups, prices) => ({
   prices
 })
 
-export const fetchCatalog = () => async (dispatch, getState, DB) => {
+export const fetchCatalog = () => async (dispatch, getState, db) => {
 
   const { catalog } = getState();
   if (catalog.isLoaded || catalog.isLoading)
@@ -78,21 +78,55 @@ export const fetchCatalog = () => async (dispatch, getState, DB) => {
   dispatch(requestCatalogAction());
 
   try {
-    const { items, groups, prices } = await DB.remote.getCatalog('price1');
 
-    const itemsArray = Object.keys(items).map(key => {
+    let { items, groups } = await db.local.getCatalog();
+    if (items.length === 0 || groups.length === 0) {
+
+      let { items: _items, groups: _groups, prices } = await db.remote.getCatalog('price1');
+
+      items = Object.keys(_items).map(key => {
+        return {
+          'guid': key,
+          ..._items[key],
+          price: prices[key]
+        }
+      })
+
+      groups = utils.objectToArray(_groups);
+      await db.local.saveCatalog(items, groups);
+    }
+
+    dispatch(recieveCatalogAction(items, groups));
+
+  } catch (error) {
+    console.error(error.message);
+  }
+}
+
+export const fetchCatalogRemote = () => async (dispatch, getState, db) => {
+
+  const { catalog } = getState();
+  if (catalog.isLoaded || catalog.isLoading)
+    return;
+
+  dispatch(requestCatalogAction());
+
+  try {
+
+    let { items: _items, groups: _groups, prices } = await db.remote.getCatalog('price1');
+
+    const items = Object.keys(_items).map(key => {
       return {
         'guid': key,
-        ...items[key],
+        ..._items[key],
         price: prices[key]
       }
     })
 
-    const groupsArray = utils.objectToArray(groups);
+    const groups = utils.objectToArray(_groups);
+    await db.local.saveCatalog(items, groups);
 
-    DB.local.saveCatalog(itemsArray, groupsArray);
-
-    dispatch(recieveCatalogAction(itemsArray, groupsArray));
+    dispatch(recieveCatalogAction(items, groups));
 
   } catch (error) {
     console.error(error.message);
