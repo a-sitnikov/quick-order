@@ -31,31 +31,26 @@ class ItemsList extends Component {
     const { dispatch, location } = this.props;
 
     const query = queryString.parse(location.search);
-    const text = query.search;
-    if (text)
-      dispatch(filterItems(text));
+    this.searchText = query.search;
+    if (this.searchTex)
+      dispatch(filterItems(this.searchText));
 
   }
 
   componentWillReceiveProps(props) {
 
-    if (this.props.location.search !== props.location.search) {
-      console.log(1);
-      this.filterItemsByLocation(props.location)
+    const { dispatch } = this.props;
+    const query = queryString.parse(props.location.search);
+
+    if (this.searchText !== query.search) {
+      this.searchText = query.search;
+      dispatch(filterItems(this.searchText));
     }
 
     if (props.items !== this.props.items) {
-      this.filterItemsByLocation(props.location)
+      dispatch(filterItems(this.searchText));
     }
 
-  }
-
-  filterItemsByLocation = location => {
-    const { dispatch } = this.props;
-    const query = queryString.parse(location.search);
-    const text = query.search;
-    if (text)
-      dispatch(filterItems(text));
   }
 
   componentDidUpdate() {
