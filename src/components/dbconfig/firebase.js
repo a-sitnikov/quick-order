@@ -18,7 +18,8 @@ class FirebaseConfig extends Component {
     const isDemo = true;
     dispatch(fbDoConnect(apiKey, databaseURL, isDemo));
     // full reload window to initialize remoteDB
-    window.location.pathname = '/'
+    window.location.hash = '#/';
+    window.location.reload();
   }
 
   render() {

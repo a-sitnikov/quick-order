@@ -95,15 +95,19 @@ export const getFilteredItems = (items, groups, searchText) => {
   });
 }
 
-export const filterItems = () => (dispatch, getState, remoteDB) => {
+export const filterItems = (text) => (dispatch, getState, db) => {
   const { catalog } = getState();
+
+  if (catalog.list.items.length === 0)
+    return;
+
   dispatch({
     type: FILTER,
-    payload: getFilteredItems(catalog.list.items, catalog.groups.selected, catalog.list.searchText)
+    payload: getFilteredItems(catalog.list.items, catalog.groups.selected, text)
   });
 }
 
-export const searchTextItems = (text) => (dispatch, getState, remoteDB) => {
+export const searchTextItems = (text) => (dispatch, getState, db) => {
   dispatch({
     type: SEARCH_TEXT,
     text

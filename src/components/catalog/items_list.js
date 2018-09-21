@@ -1,14 +1,15 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { compose } from 'redux'
-import { Link } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 
 import { throttle } from 'lodash'
+import queryString from 'query-string'
 
 import { Table, TableBody, TableRow, TableCell, withStyles, TableFooter } from '@material-ui/core';
 
 import Header from '../common/table_header'
-import { setSortItems, addSortItems } from '../../modules/catalog/items_list'
+import { setSortItems, addSortItems, filterItems } from '../../modules/catalog/items_list'
 import { changeQty } from '../../modules/cart'
 
 import { format } from '../../utils'
@@ -23,6 +24,38 @@ class ItemsList extends Component {
       endIndex: 14,
       count: 15
     }
+  }
+
+  componentDidMount() {
+
+    const { dispatch, location } = this.props;
+
+    const query = queryString.parse(location.search);
+    const text = query.search;
+    if (text)
+      dispatch(filterItems(text));
+
+  }
+
+  componentWillReceiveProps(props) {
+
+    if (this.props.location.search !== props.location.search) {
+      console.log(1);
+      this.filterItemsByLocation(props.location)
+    }
+
+    if (props.items !== this.props.items) {
+      this.filterItemsByLocation(props.location)
+    }
+
+  }
+
+  filterItemsByLocation = location => {
+    const { dispatch } = this.props;
+    const query = queryString.parse(location.search);
+    const text = query.search;
+    if (text)
+      dispatch(filterItems(text));
   }
 
   componentDidUpdate() {
@@ -112,7 +145,7 @@ class ItemsList extends Component {
 
   render() {
 
-    const { order, items, filteredItems , cart, classes } = this.props;
+    const { order, items, filteredItems, cart, classes } = this.props;
 
     let columns = [
       { id: 'code', numeric: false, label: 'Код', sortable: true, width: 100 },
@@ -121,7 +154,7 @@ class ItemsList extends Component {
       { id: 'qty', numeric: true, label: 'Количество', sortable: false, width: 50 }
     ]
 
-    let itemsArray = filteredItems || items;
+    let itemsArray = filteredItems === null ? items : filteredItems;
 
     let rows = [];
     const endIndex = Math.min(this.state.endIndex, itemsArray.length - 1);
@@ -136,11 +169,11 @@ class ItemsList extends Component {
         >
           <TableCell>{item.code}</TableCell>
           <TableCell>
-            <Link 
+            <Link
               to={{
                 pathname: `/items/${item.guid}`,
                 state: { item }
-              }} 
+              }}
               className={classes.link}
             >
               {item.descr}
@@ -209,6 +242,7 @@ const styles = theme => ({
 })
 
 export default compose(
+  withRouter,
   connect(mapStateToProps),
   withStyles(styles)
 )(ItemsList);

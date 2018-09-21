@@ -23,7 +23,7 @@ const middleware = [thunk.withExtraArgument({
 })];
 
 if (process.env.NODE_ENV !== 'production') {
-    //middleware.push(createLogger())
+  middleware.push(createLogger())
 }
 
 export const store = createStore(rootReducer, initialState, applyMiddleware(...middleware));

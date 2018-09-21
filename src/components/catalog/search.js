@@ -1,24 +1,40 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { compose } from 'redux'
+import { withRouter } from 'react-router-dom'
 import { FormControl, InputLabel, Input, InputAdornment, IconButton, withStyles } from '@material-ui/core';
 import { Search as SearchIcon, Clear } from '@material-ui/icons'
 
-import { searchTextItems, filterItems } from '../../modules/catalog/items_list'
+import queryString from 'query-string'
 
 class Search extends Component {
 
   constructor() {
     super();
-    this.state = { text: '' }
+    this.state = { text: ''};
   }
 
   componentDidMount() {
     window.addEventListener("keydown", this.focusInput);
+
+    const { location } = this.props;
+    this.setStateFromLocation(location);
   }
 
   componentWillUnmount() {
     window.removeEventListener("keydown", this.focusInput);
+  }
+
+  componentWillReceiveProps(props) {
+    const { location } = props;
+    this.setStateFromLocation(location);
+  }
+
+  setStateFromLocation = location => {
+    const query = queryString.parse(location.search);
+    const text = query.search || '';
+    if (text !== this.state.text) 
+      this.setState({ text });
   }
 
   focusInput = event => {
@@ -33,29 +49,35 @@ class Search extends Component {
 
   handleKeyDown = event => {
     if (event.key === 'Enter') {
-      const { dispatch } = this.props;
-      dispatch(filterItems());
+      this.handleSearch();
     }
   }
 
   handleChange = event => {
-    const { dispatch } = this.props;
-    dispatch(searchTextItems(event.target.value));
-}
+    this.setState({
+      text: event.target.value
+    });
+  }
 
   handleSearch = event => {
-    const { dispatch } = this.props;
-    dispatch(filterItems());
-}
+    this.gotoSearch(this.state.text);
+  }
 
   handleClearSearch = event => {
-    const { dispatch } = this.props;
-    dispatch(searchTextItems(''));
-    dispatch(filterItems());
+    this.gotoSearch('');
+  }
+
+  gotoSearch = text => {
+    const { history } = this.props;
+    if (text)
+      history.push('/?search=' + text);
+    else  
+      history.push('/');
   }
 
   render() {
-    const { text, classes } = this.props;
+    const { classes } = this.props;
+    const { text } = this.state;
     return (
       <div className={classes.search}>
         <FormControl style={{ width: "100%" }}>
@@ -72,7 +94,7 @@ class Search extends Component {
             value={text}
             onChange={this.handleChange}
             onKeyPress={this.handleKeyDown}
-            inputRef = {node => this.inputRef = node}
+            inputRef={node => this.inputRef = node}
             endAdornment={
               <InputAdornment position="end">
                 <IconButton
@@ -104,14 +126,8 @@ const styles = theme => ({
   }
 })
 
-const mapStateToProps = (state) => {
-
-  return {
-    text: state.catalog.list.searchText
-  }
-}
-
 export default compose(
-  connect(mapStateToProps),
+  withRouter,
+  connect(),
   withStyles(styles)
 )(Search);

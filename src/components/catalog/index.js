@@ -7,6 +7,7 @@ import Search from './search';
 import ItemsList from './items_list';
 import CartInfo from './cart_info'
 import GropusList from './groups_list';
+import TableToolbar from './table_toolbar';
 
 import { fetchCatalog } from '../../modules/catalog'
 
@@ -27,6 +28,7 @@ class Catalog extends Component {
       <div className={classnames("container", classes.catalog)}>
         <div className={classnames("flex-column", classes.leftPanel)}>
           <Search />
+          <TableToolbar />
           <ItemsList />
         </div>
         <div className={classnames("flex-column", classes.rightPanel)}>

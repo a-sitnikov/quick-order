@@ -7,13 +7,16 @@ export const defaultState = {
   list: listDefaultState,
   groups: groupsDefaultState,
   isLoaded: false,
-  isLoading: false
+  isLoading: false,
+  lastUpdated: null
 }
 
 export const REQUEST = 'REQUEST_CATALOG';
 export const RECIEVE = 'RECIEVE_CATALOG';
 
-export const recieveReducer = (state, items, groups) => {
+export const CATALOG_LAST_UPDATED = 'catalog/lastUpdated'
+
+export const recieveReducer = (state, items, groups, lastUpdated) => {
 
   if (state.order)
     items.sort(utils.funcOrderBy(state.order))
@@ -34,7 +37,8 @@ export const recieveReducer = (state, items, groups) => {
       selected: [],
     },
     isLoaded: true,
-    isLoading: false
+    isLoading: false,
+    lastUpdated
   };
 }
 
@@ -47,7 +51,7 @@ export default function reducer(state = defaultState, action) {
         isLoading: true
       }
     case RECIEVE:
-      return recieveReducer(state, action.items, action.groups, action.prices)
+      return recieveReducer(state, action.items, action.groups, action.lastUpdated)
 
     default:
       return {
@@ -62,41 +66,25 @@ export const requestCatalogAction = () => ({
   type: REQUEST
 })
 
-export const recieveCatalogAction = (items, groups, prices) => ({
+export const recieveCatalogAction = (items, groups, lastUpdated) => ({
   type: RECIEVE,
   items,
   groups,
-  prices
+  lastUpdated
 })
 
 export const fetchCatalog = () => async (dispatch, getState, db) => {
-
-  const { catalog } = getState();
-  if (catalog.isLoaded || catalog.isLoading)
-    return;
-
-  dispatch(requestCatalogAction());
 
   try {
 
     let { items, groups } = await db.local.getCatalog();
     if (items.length === 0 || groups.length === 0) {
-
-      let { items: _items, groups: _groups, prices } = await db.remote.getCatalog('price1');
-
-      items = Object.keys(_items).map(key => {
-        return {
-          'guid': key,
-          ..._items[key],
-          price: prices[key]
-        }
-      })
-
-      groups = utils.objectToArray(_groups);
-      await db.local.saveCatalog(items, groups);
+      dispatch(fetchCatalogRemote());
+    } else {
+      const lastUpdatedStr = localStorage.getItem(CATALOG_LAST_UPDATED);
+      let lastUpdated = new Date(+lastUpdatedStr);
+      dispatch(recieveCatalogAction(items, groups, lastUpdated));
     }
-
-    dispatch(recieveCatalogAction(items, groups));
 
   } catch (error) {
     console.error(error.message);
@@ -106,7 +94,7 @@ export const fetchCatalog = () => async (dispatch, getState, db) => {
 export const fetchCatalogRemote = () => async (dispatch, getState, db) => {
 
   const { catalog } = getState();
-  if (catalog.isLoaded || catalog.isLoading)
+  if (catalog.isLoading)
     return;
 
   dispatch(requestCatalogAction());
@@ -126,7 +114,9 @@ export const fetchCatalogRemote = () => async (dispatch, getState, db) => {
     const groups = utils.objectToArray(_groups);
     await db.local.saveCatalog(items, groups);
 
-    dispatch(recieveCatalogAction(items, groups));
+    const lastUpdated = new Date();
+    localStorage.setItem(CATALOG_LAST_UPDATED, lastUpdated.getTime());
+    dispatch(recieveCatalogAction(items, groups, lastUpdated));
 
   } catch (error) {
     console.error(error.message);
