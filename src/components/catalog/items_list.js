@@ -33,7 +33,9 @@ class ItemsList extends Component {
     const query = queryString.parse(location.search);
     this.searchText = query.search;
     if (this.searchTex)
-      dispatch(filterItems(this.searchText));
+      dispatch(filterItems());
+
+    this.rowChanged = true;  
 
   }
 
@@ -44,19 +46,20 @@ class ItemsList extends Component {
 
     if (this.searchText !== query.search) {
       this.searchText = query.search;
-      dispatch(filterItems(this.searchText));
+      dispatch(filterItems());
     }
 
     if (props.items !== this.props.items) {
-      dispatch(filterItems(this.searchText));
+      dispatch(filterItems());
     }
 
   }
 
   componentDidUpdate() {
-    if (this.currentInput) {
+    if (this.currentInput && this.rowChanged) {
       this.currentInput.focus();
       this.currentInput.select();
+      this.rowChanged = false;
     }
   }
 
@@ -77,6 +80,8 @@ class ItemsList extends Component {
       endIndex = currentRow;
       startIndex = endIndex - count + 1;
     }
+
+    this.rowChanged = true;
 
     this.setState({
       currentRow,
@@ -117,9 +122,9 @@ class ItemsList extends Component {
   }
 
   handleRowClik = currentRow => event => {
-    this.setState({
-      currentRow
-    })
+
+    if (this.state.currentRow !== currentRow)
+      this.setCurrentRow(currentRow);
   }
 
   setInputRef = i => element => {
@@ -155,7 +160,7 @@ class ItemsList extends Component {
     const endIndex = Math.min(this.state.endIndex, itemsArray.length - 1);
     for (let i = this.state.startIndex; i <= endIndex; i++) {
       const item = itemsArray[i];
-      const cartItem = cart.itemsByKey[item.guid] || {};
+      const cartItem = cart[item.guid] || {};
       rows.push(
         <TableRow
           key={item.guid}
@@ -217,12 +222,11 @@ class ItemsList extends Component {
 const mapStateToProps = (state) => {
 
   const { items, filteredItems, order } = state.catalog.list;
-
   return {
     items,
     filteredItems,
     order,
-    cart: state.cart
+    cart: state.cart.itemsByKey
   }
 }
 

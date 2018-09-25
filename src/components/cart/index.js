@@ -93,32 +93,32 @@ class Cart extends Component {
           </Header>
           <TableBody>
             {
-              items.map((val, i) => (
-                <TableRow key={val.item.guid}>
+              items.map((item, i) => (
+                <TableRow key={item.guid}>
                   <TableCell padding="checkbox">
                     <Checkbox
-                      checked={this.state.checkedItems[val.item.guid] === true}
-                      onChange={this.onSelectClick(val.item)}
+                      checked={this.state.checkedItems[item.guid] === true}
+                      onChange={this.onSelectClick(item)}
                     />
                   </TableCell>
                   <TableCell>{i + 1}</TableCell>
-                  <TableCell>{val.item.code}</TableCell>
+                  <TableCell>{item.code}</TableCell>
                   <TableCell>
-                    <Link to={`/items/${val.item.guid}`} className={classes.link}>
-                      {val.item.descr}
+                    <Link to={`/items/${item.guid}`} className={classes.link}>
+                      {item.descr}
                     </Link>
                   </TableCell>
-                  <TableCell numeric>{format(val.item.price)}</TableCell>
+                  <TableCell numeric>{format(item.price)}</TableCell>
                   <TableCell numeric>
                     <input
-                      value={val.qty === 0 ? "" : val.qty}
+                      value={item.qty === 0 ? "" : item.qty}
                       type="number"
                       className={classes.input}
-                      onChange={this.handleQtyChange(val.item)}
+                      onChange={this.handleQtyChange(item)}
                     //ref={this.setInputRef(i)}
                     />
                   </TableCell>
-                  <TableCell numeric>{format(val.sum)}</TableCell>
+                  <TableCell numeric>{format(item.sum)}</TableCell>
                 </TableRow>
               ))
             }

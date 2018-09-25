@@ -10,6 +10,7 @@ import GropusList from './groups_list';
 import TableToolbar from './table_toolbar';
 
 import { fetchCatalog } from '../../modules/catalog'
+import { fetchCart } from '../../modules/cart'
 
 import { withStyles } from '@material-ui/core';
 
@@ -18,6 +19,7 @@ class Catalog extends Component {
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch(fetchCatalog());
+    dispatch(fetchCart());
   }
 
   render() {

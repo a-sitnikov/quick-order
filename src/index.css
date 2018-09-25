@@ -13,3 +13,13 @@ body {
   display: flex;
   flex-direction: row
 }
+
+.spin {
+  animation: spin 1.3s infinite ease 
+}
+
+@keyframes spin {
+  0%   {transform:rotate(0)}
+  20%  {transform:rotate(-45deg)}
+  100% {transform:rotate(360deg)}
+}

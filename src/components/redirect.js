@@ -6,6 +6,7 @@ import { Redirect, withRouter } from 'react-router-dom'
 
 import NavBar from './navbar'
 import Login from './login'
+import Loader from './loader'
 
 const MyRedirect = ({ dbtype, params, userId, component: Component, showNavbar, ...props }) => {
 
@@ -32,6 +33,7 @@ const MyRedirect = ({ dbtype, params, userId, component: Component, showNavbar, 
       <div style={{ height: "100%", paddingTop: 53 }}>
         <NavBar />
         <Component {...props} />
+        <Loader />
       </div>
     )
   else

@@ -8,97 +8,120 @@ export const defaultState = {
   order: []
 }
 
-export const SET_SORT = 'SORT_CART';
-export const ADD_SORT = 'ADD_SORT_CART';
+export const SORT = 'SORT_CART';
 export const CHANGE_QTY = 'CHANGE_QTY';
+export const RECIEVE = 'RECIEVE_CART';
 
-export const changeQtyReducer = (state, item, qty, deleteOnNull) => {
+export const changeQtyReducer = (state, cartItem, deleteOnNull) => {
 
-  let itemsByKey = Object.assign(state.itemsByKey);
+  let itemsByKey = Object.assign({}, state.itemsByKey);
 
-  if (qty === 0) {
-    if (deleteOnNull) 
-      delete itemsByKey[item.guid];
+  if (cartItem.qty === 0) {
+    if (deleteOnNull)
+      delete itemsByKey[cartItem.guid];
     else {
-      itemsByKey[item.guid].qty = 0;
-      itemsByKey[item.guid].sum = 0;
-    }  
-  } else {  
-    let cartItem = itemsByKey[item.guid] || {};
-    cartItem.item = item;
-    cartItem.qty = qty;
-    cartItem.sum = Math.round(100 * qty * item.price) / 100;
-    itemsByKey[item.guid] = cartItem;
+      itemsByKey[cartItem.guid].qty = 0;
+      itemsByKey[cartItem.guid].sum = 0;
+    }
+  } else {
+    itemsByKey[cartItem.guid] = cartItem;
   }
 
-  const count = Object.keys(itemsByKey).filter(key => itemsByKey[key].qty !== 0).length;
-  const sum = Object.keys(itemsByKey).reduce((acc, key) => acc + itemsByKey[key].sum, 0);
-  let items = [];
-  Object.keys(itemsByKey).forEach(key => items.push(itemsByKey[key]));
-
+  const items = Object.keys(itemsByKey).map(key => itemsByKey[key]);
+  const count = items.filter(item => item.qty !== 0).length;
+  const sum = items.reduce((acc, item) => acc + item.sum, 0);  
+  
   return {
     ...state,
-    itemsByKey,
     items,
-    count,
+    itemsByKey,
+    count, 
     sum
   }
 
 }
 
-export const changeQty = (item, qty, deleteOnNull = true) => ({
-  type: CHANGE_QTY,
-  item,
-  qty,
-  deleteOnNull
-})
-
-export const setSortReducer = (state, field) => {
-
-  const order = utils.setSort(state.order, field);
-
+export const sortReducer = (state, order) => {
   return {
     ...state,
     order,
     items: utils.sortAndCopyArray(state.items, order)
-  };
-
+  }
 }
 
-export const addSortReducer = (state, field) => {
+export const recieveReducer = (state, items) => {
 
-  const order = utils.addSort(state.order, field);
+  let itemsByKey = {};
+  items.forEach(item => itemsByKey[item.guid] = item);
+
+  const count = items.filter(item => item.qty !== 0).length;
+  const sum = items.reduce((acc, item) => acc + item.sum, 0);  
 
   return {
     ...state,
-    order,
-    items: utils.sortAndCopyArray(state.items, order)
-  };
-
+    items,
+    itemsByKey,
+    count,
+    sum
+  }
 }
-
 
 export default function reducer(state = defaultState, action) {
 
   switch (action.type) {
-    case SET_SORT:
-      return setSortReducer(state, action.payload);
-    case ADD_SORT:
-      return addSortReducer(state, action.payload);
+    case SORT:
+      return sortReducer(state, action.order);
     case CHANGE_QTY:
-      return changeQtyReducer(state, action.item, action.qty)
+      return changeQtyReducer(state, action.cartItem)
+    case RECIEVE:
+      return recieveReducer(state, action.items);  
     default:
       return state;
   }
 
 }
 
-export const setSortCart = (orderBy) => ({
-  type: SET_SORT,
-  payload: orderBy
+export const sortItems = (order) => ({
+  type: SORT,
+  order
 })
 
-export const addSortCart = (orderBy) => ({
-  type: ADD_SORT,
-  payload: orderBy
-})
+export const addSortCart = (field) => (dispatch, getState, db) => {
+  const { cart } = getState();
+  const order = utils.addSort(cart.order, field);
+  dispatch(sortItems(order));
+}
+
+export const setSortCart = (field) => (dispatch, getState, db) => {
+  const { cart } = getState();
+  const order = utils.setSort(cart.order, field);
+  dispatch(sortItems(order));
+}
+
+export const changeQty = (item, qty, deleteOnNull = true) => async (dispatch, getState, db) => {
+
+  const cartItem = {
+    ...item,
+    qty,
+    sum: Math.round(100 * qty * item.price) / 100
+  }  
+  
+  if (qty === 0 && deleteOnNull)
+    await db.local.deleteFromCart(cartItem);
+  else
+    await db.local.addToCart(cartItem);
+
+  dispatch({
+    type: CHANGE_QTY,
+    cartItem,
+    deleteOnNull
+  })
+}
+
+export const fetchCart = () => async (dispatch, getState, db) => {
+  const items = await db.local.getCart(); 
+  dispatch({
+    type: RECIEVE,
+    items
+  })
+}

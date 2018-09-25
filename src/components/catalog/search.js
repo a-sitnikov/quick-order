@@ -7,6 +7,8 @@ import { Search as SearchIcon, Clear } from '@material-ui/icons'
 
 import queryString from 'query-string'
 
+import { searchTextItems } from '../../modules/catalog/items_list'
+
 class Search extends Component {
 
   constructor() {
@@ -33,8 +35,10 @@ class Search extends Component {
   setStateFromLocation = location => {
     const query = queryString.parse(location.search);
     const text = query.search || '';
-    if (text !== this.state.text) 
+    if (text !== this.state.text) {
       this.setState({ text });
+      this.props.dispatch(searchTextItems(text));
+    }  
   }
 
   focusInput = event => {

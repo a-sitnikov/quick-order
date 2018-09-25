@@ -95,7 +95,7 @@ export const getFilteredItems = (items, groups, searchText) => {
   });
 }
 
-export const filterItems = (text) => (dispatch, getState, db) => {
+export const filterItems = () => (dispatch, getState, db) => {
   const { catalog } = getState();
 
   if (catalog.list.items.length === 0)
@@ -103,7 +103,7 @@ export const filterItems = (text) => (dispatch, getState, db) => {
 
   dispatch({
     type: FILTER,
-    payload: getFilteredItems(catalog.list.items, catalog.groups.selected, text)
+    payload: getFilteredItems(catalog.list.items, catalog.groups.selected, catalog.list.searchText)
   });
 }
 

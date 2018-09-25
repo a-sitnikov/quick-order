@@ -5,7 +5,7 @@ class LocalDB {
   }
 
   initialize = async () => {
-    let request = indexedDB.open('local', 1, this.handleUpgrade);
+    let request = indexedDB.open('local', 2, this.handleUpgrade);
     request.onupgradeneeded = this.handleUpgrade;
     request.onsuccess = event => {
       this.db = request.result;
@@ -21,6 +21,9 @@ class LocalDB {
     }
     if (!upgradeDb.objectStoreNames.contains('groups')) {
       upgradeDb.createObjectStore('groups', { keyPath: 'guid' });
+    }
+    if (!upgradeDb.objectStoreNames.contains('cart')) {
+      upgradeDb.createObjectStore('cart', { keyPath: 'guid' });
     }
   }
 
@@ -62,12 +65,32 @@ class LocalDB {
       this.getTable('items'),
       this.getTable('groups'),
     ]);
-    
+
     return {
       items,
       groups
     }
 
+  }
+
+  getCart = async () => {
+    return this.getTable('cart');
+  }
+
+  addToCart = async (cartItem) => {
+    
+    return new Promise((resolve, reject) => {
+
+      const tx = this.db.transaction('cart', 'readwrite');
+      const table = tx.objectStore('cart');
+      const request = table.put(cartItem);
+      request.onsuccess = (event) => {
+        resolve();
+      }
+      request.onerror = error => {
+        reject(error);
+      }
+    });  
   }
 
 }
