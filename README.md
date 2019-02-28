@@ -1,4 +1,4 @@
-# Quick Order [![Build Status](https://api.travis-ci.org/a-sitnikov/quick-order.svg?branch=master)](https://travis-ci.org/a-sitnikov/quick-order)
+# Quick Order [![Build Status](https://api.travis-ci.com/a-sitnikov/quick-order.svg?branch=master)](https://travis-ci.org/a-sitnikov/quick-order)
 
 Программа для формирования заказов
 
